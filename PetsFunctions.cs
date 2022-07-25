@@ -3,9 +3,6 @@ using LanguageExt.Common;
 
 public static class PetsFunctions
 {
-    public static List<Activity> Activities = new List<Activity>();
-
-
     public static Option<List<object>> GetPets() =>
         new List<object> { new { Id = "abc123", Name = "Mooky" } };
 
@@ -47,13 +44,18 @@ public static class PetsFunctions
                 },
             None: Option<List<object>>.None);
 
+
+    //temp db
+    public static List<Activity> Activities = new List<Activity>();
+
+    //This would probably be a `Need` coming in
     public static Result<Activity> LogActivity(string petId, Activity activity) =>
-        GetPet(petId)
+        GetActivities(petId)
         .Match(
-            Some: p =>
+            Some: acs =>
             {
-                var newActivity = Activity.NewFrom(activity);
-                Activities.Add(newActivity);
+                var newActivity = activity with { When = DateTime.Now };
+                acs.Add(newActivity);
                 return new Result<Activity>(newActivity);
             },
             None: new Result<Activity>(new Exception("Error adding activity")));
@@ -63,5 +65,4 @@ public static class PetsFunctions
         .Match(
             Some: p => Activities,
             None: Option<List<Activity>>.None);
-
 }

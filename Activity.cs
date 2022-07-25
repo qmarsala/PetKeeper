@@ -2,9 +2,6 @@
 // this `What` would be a `Need` so we can know it is not a current need once completed.
 public record Activity(string What, DateTime When, string Notes)
 {
-    public static Activity NewFrom(Activity activity)
-      => New(activity.What, DateTime.Now, activity.Notes);
-
     public static Activity New(string what, DateTime? when, string? notes)
       => (what, when, notes) switch
       {
