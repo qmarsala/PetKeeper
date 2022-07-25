@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using LanguageExt.Common;
 using static PetsFunctions;
 using static ActivityLogFunctions;
-using LanguageExt.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,42 +22,42 @@ app.UseHttpsRedirection();
 
 app.MapGet("pets", () =>
     GetPets()
-    .Match<IResult>(
+    .Match(
         Some: ps => Results.Ok(new { Pets = ps }),
         None: Results.NotFound()));
 
 app.MapGet("pets/{petId}", (string petId) =>
     GetPet(petId)
-    .Match<IResult>(
+    .Match(
         Some: p => Results.Ok(p),
         None: Results.NotFound()));
 
 app.MapGet("pets/{petId}/needs", (string petId) =>
     GetNeeds(petId)
-    .Match<IResult>(
+    .Match(
         Some: ns => Results.Ok(new { Needs = ns }),
         None: Results.NotFound()));
 
 
 app.MapPost("pets/{petId}/activities", (string petId, [FromBody] LogActivityRequest request) =>
     GetPet(petId)
-    .Map<Result<Activity>>(_ => LogActivity(petId, request.NeedId, request.Notes))
-    .Match<IResult>(
+    .Map(_ => LogActivity(petId, request.NeedId, request.Notes))
+    .Match(
         Some: ra =>
-            ra.Match<IResult>(
+            ra.Match(
                 Succ: a => Results.Created("activities", a),
                 Fail: e => Results.StatusCode(500)),
         None: Results.NotFound()));
 
 app.MapGet("pets/{petId}/activities", (string petId) =>
     GetActivities(petId)
-    .Match<IResult>(
+    .Match(
         Some: acs => Results.Ok(new { Activities = acs }),
         None: Results.NotFound()));
 
 app.MapGet("pets/activities", () =>
     GetActivities()
-    .Match<IResult>(
+    .Match(
         Some: acs => Results.Ok(new { Activities = acs }),
         None: Results.NotFound()));
 

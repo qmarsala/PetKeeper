@@ -11,7 +11,7 @@ public static class ActivityLogFunctions
     public static Option<List<Activity>> GetActivities(string petId) => Activities.Where(a => a.PetId == petId).ToList();
 
     public static Result<Activity> LogActivity(string petId, string? needId, string notes)
-    {   
+    {
         var newActivity = new Activity
         {
             PetId = petId,
@@ -21,5 +21,5 @@ public static class ActivityLogFunctions
         };
         Activities.Add(newActivity);
         return new Result<Activity>(newActivity);
-    }   
+    }
 }

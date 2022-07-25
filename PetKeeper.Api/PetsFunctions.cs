@@ -1,5 +1,4 @@
 using LanguageExt;
-using LanguageExt.Common;
 
 public static class PetsFunctions
 {
@@ -48,7 +47,7 @@ public static class PetsFunctions
 
     public static Option<IEnumerable<Need>> GetNeeds(string petId) =>
         GetPet(petId)
-        .Match<Option<IEnumerable<Need>>>(
+        .Match(
             Some: p => Option<IEnumerable<Need>>.Some(p.Needs),
             None: Option<IEnumerable<Need>>.None);
 }
