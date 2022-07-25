@@ -3,46 +3,54 @@ using LanguageExt.Common;
 
 public static class PetsFunctions
 {
-    public static Option<List<object>> GetPets() =>
-        new List<object> { new { Id = "abc123", Name = "Mooky" } };
-
-    public static Option<object> GetPet(string petId) =>
-        petId == "abc123"
-            ? new { Id = "abc123", Name = "Mooky" }
-            : Option<object>.None;
-
-    public static Option<List<object>> GetNeeds(string petId) =>
-        GetPet(petId)
-        .Match<Option<List<object>>>(
-            Some: p => new List<object> {
-                    new {
-                        Id = "n1",
-                        Type = "Food",
-                        What = "Royal Canine",
-                        // obviosly not a free form string 
-                        // we want a concept of 'When' so we can filter on upcoming/now
-                        // more like a schedule/cadence than an actual time.
-                        When = "2x Daily - Breakfast, Dinner",
-                        Notes = "2 cups dry kibble - spoon of canned food mixed in"
+    private static Pet Mooky = new()
+    {
+        Id = "abc123",
+        Name = "Mooky",
+        Birthday = new DateTime(2013, 6, 14),
+        Breed = new Breed("German Shepherd"),
+        Needs = new List<Need>
+                {
+                    new Need
+                    {
+                        Name = "Food",
+                        Notes = "2 cups dry kibble - spoon of canned food mixed in",
+                        Days = Enumerable.Range(0,7).Select(n => (DayOfWeek)n),
+                        Times = 2
                     },
-                    new {
-                        Id = "n2",
-                        Type = "Medication",
-                        What = "Carboprofin",
-                        // When needs to be some sort of date type 
-                        // but associating to other events needs to be considered
-                        When = "With Dinner",
-                        Notes = "For pain management"
+                    new Need
+                    {
+                        Name = "Pain Medication",
+                        Notes = "Carboprofen - Give with Dinner", // how to "link" with dinner
+                        Days = Enumerable.Range(0,7).Select(n => (DayOfWeek)n),
+                        Times = 1
                     },
-                    new {
-                        Id = "n3",
-                        Type = "Training",
-                        What = "Lesson 7",
-                        When = "3x per day",
-                        Notes = "Let mooky get to the end of the leash and recall."
+                    new Need
+                    {
+                        Name = "Training: Lesson 7",
+                        Notes = "Let Mooky get to the end of the leash to practice recall",
+                        Days = Enumerable.Range(0,7).Select(n => (DayOfWeek)n),
+                        Times = 3
                     }
-                },
-            None: Option<List<object>>.None);
+                }
+    };
+
+    public static Option<List<Pet>> GetPets() =>
+        new List<Pet>
+        {
+            Mooky
+        };
+
+    public static Option<Pet> GetPet(string petId) =>
+        petId == "abc123"
+            ? Mooky
+            : Option<Pet>.None;
+
+    public static Option<IEnumerable<Need>> GetNeeds(string petId) =>
+        GetPet(petId)
+        .Match<Option<IEnumerable<Need>>>(
+            Some: p => Option<IEnumerable<Need>>.Some(p.Needs),
+            None: Option<IEnumerable<Need>>.None);
 
 
     //temp db
