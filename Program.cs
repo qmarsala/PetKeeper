@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using static PetsFunctions;
 using static ActivityLogFunctions;
 using LanguageExt.Common;
-using System.Linq;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,17 +41,7 @@ app.MapGet("pets/{petId}/needs", (string petId) =>
 
 app.MapPost("pets/{petId}/activities", (string petId, [FromBody] LogActivityRequest request) =>
     GetPet(petId)
-    .Map<Result<Activity>>(p =>
-    {
-        try
-        {
-            return LogActivity(p, p.Needs.Single(n => n.Id == request.NeedId), request.Notes);
-        }
-        catch
-        {
-            return new Result<Activity>(new Exception("Unknown need"));
-        }
-    })
+    .Map<Result<Activity>>(_ => LogActivity(petId, request.NeedId, request.Notes))
     .Match<IResult>(
         Some: ra =>
             ra.Match<IResult>(
@@ -75,4 +64,4 @@ app.MapGet("pets/activities", () =>
 app.Run();
 
 
-public record LogActivityRequest(string NeedId, string Notes);
+public record LogActivityRequest(string? NeedId, string Notes);

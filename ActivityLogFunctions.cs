@@ -10,12 +10,12 @@ public static class ActivityLogFunctions
 
     public static Option<List<Activity>> GetActivities(string petId) => Activities.Where(a => a.PetId == petId).ToList();
 
-    public static Result<Activity> LogActivity(Pet pet, Need need, string notes)
+    public static Result<Activity> LogActivity(string petId, string? needId, string notes)
     {   
         var newActivity = new Activity
         {
-            PetId = pet.Id,
-            NeedId = need.Id,
+            PetId = petId,
+            NeedId = needId,
             When = DateTime.Now,
             Notes = notes
         };
