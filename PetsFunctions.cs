@@ -51,26 +51,4 @@ public static class PetsFunctions
         .Match<Option<IEnumerable<Need>>>(
             Some: p => Option<IEnumerable<Need>>.Some(p.Needs),
             None: Option<IEnumerable<Need>>.None);
-
-
-    //temp db
-    public static List<Activity> Activities = new List<Activity>();
-
-    //This would probably be a `Need` coming in
-    public static Result<Activity> LogActivity(string petId, Activity activity) =>
-        GetActivities(petId)
-        .Match(
-            Some: acs =>
-            {
-                var newActivity = activity with { When = DateTime.Now };
-                acs.Add(newActivity);
-                return new Result<Activity>(newActivity);
-            },
-            None: new Result<Activity>(new Exception("Error adding activity")));
-
-    public static Option<List<Activity>> GetActivities(string petId) =>
-        GetPet(petId)
-        .Match(
-            Some: p => Activities,
-            None: Option<List<Activity>>.None);
 }
