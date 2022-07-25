@@ -1,6 +1,6 @@
 on: push
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -8,4 +8,4 @@ jobs:
         with:
           dotnet-version: '7.0.x'
           include-prerelease: true
-      - run: dotnet build
+      - run: dotnet test
