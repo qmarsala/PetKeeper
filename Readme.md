@@ -8,4 +8,5 @@ Such as:
 - Pet activity log
     - help identify when your pet may be sick
     - know things are going ok while on vacation
+    - keep track of training sessions with notes
 - Share pet profiles with pet sitter to easily share what the pet needs, and see that it is being kept up on.
