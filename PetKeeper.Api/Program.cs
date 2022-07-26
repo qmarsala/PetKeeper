@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using LanguageExt.Common;
+
 using static PetsFunctions;
 using static ActivityLogFunctions;
 
@@ -63,5 +63,6 @@ app.MapGet("pets/activities", () =>
 
 app.Run();
 
+public partial class Program { }
 
 public record LogActivityRequest(string? NeedId, string Notes);
