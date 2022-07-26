@@ -1,3 +1,5 @@
+[![.github/workflows/build.yml](https://github.com/qmarsala/PetKeeper/actions/workflows/build.yml/badge.svg)](https://github.com/qmarsala/PetKeeper/actions/workflows/build.yml)
+
 # PetKeeper
 This project aims to help manage all the things you need to keep track of with your pets.    
 Such as:
