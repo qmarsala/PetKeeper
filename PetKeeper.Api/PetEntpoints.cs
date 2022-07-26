@@ -1,5 +1,6 @@
 using LanguageExt;
 using LanguageExt.Common;
+using PetKeeper.Core;
 
 public static class PetEntpoints
 {
@@ -58,6 +59,6 @@ public static class PetEntpoints
     public static Option<IEnumerable<Need>> GetNeeds(string petId) =>
         GetPet(petId)
         .Match(
-            Some: p => Option<IEnumerable<Need>>.Some(p.Needs),
+            Some: p => p.Needs.ToList(),
             None: Option<IEnumerable<Need>>.None);
 }

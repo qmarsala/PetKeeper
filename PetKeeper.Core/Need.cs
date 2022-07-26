@@ -1,3 +1,5 @@
+namespace PetKeeper.Core;
+
 public record Need
 {
     public string Id { get; init; } = Guid.NewGuid().ToString();

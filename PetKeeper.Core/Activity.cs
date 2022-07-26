@@ -1,3 +1,4 @@
+namespace PetKeeper.Core;
 
 public record Activity
 {
