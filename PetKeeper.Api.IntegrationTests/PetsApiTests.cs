@@ -25,7 +25,7 @@ public class PetsApiTests
 
         };
         var response = await client.PostAsJsonAsync(
-            "https://localhost7196:/pets",
+            "/pets",
             newPet);
 
         response.ShouldNotBeNull();
@@ -49,7 +49,7 @@ public class PetsApiTests
 
         var client = application.CreateClient();
 
-        var response = await client.GetAsync("https://localhost7196:/pets");
+        var response = await client.GetAsync("/pets");
 
         response.ShouldNotBeNull();
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -69,7 +69,7 @@ public class PetsApiTests
 
         var client = application.CreateClient();
         var petId = "abc123";
-        var response = await client.GetAsync($"https://localhost7196:/pets/{petId}");
+        var response = await client.GetAsync($"/pets/{petId}");
 
         response.ShouldNotBeNull();
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -95,7 +95,7 @@ public class PetsApiTests
             Days = new List<DayOfWeek>() { { DayOfWeek.Monday } },
             Times = 3
         };
-        var response = await client.PostAsJsonAsync($"https://localhost7196:/pets/{petId}/needs", newNeed);
+        var response = await client.PostAsJsonAsync($"/pets/{petId}/needs", newNeed);
 
         response.ShouldNotBeNull();
         response.StatusCode.ShouldBe(HttpStatusCode.Created);
@@ -118,7 +118,7 @@ public class PetsApiTests
 
         var client = application.CreateClient();
         var petId = "notapetid";
-        var response = await client.PostAsJsonAsync($"https://localhost7196:/pets/{petId}/needs", new { });
+        var response = await client.PostAsJsonAsync($"/pets/{petId}/needs", new { });
 
         response.ShouldNotBeNull();
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
@@ -135,7 +135,7 @@ public class PetsApiTests
 
         var client = application.CreateClient();
         var petId = "abc123";
-        var response = await client.GetAsync($"https://localhost7196:/pets/{petId}/needs");
+        var response = await client.GetAsync($"/pets/{petId}/needs");
 
         response.ShouldNotBeNull();
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -154,7 +154,7 @@ public class PetsApiTests
 
         var client = application.CreateClient();
         var petId = "notapetid";
-        var response = await client.GetAsync($"https://localhost7196:/pets/{petId}/needs");
+        var response = await client.GetAsync($"/pets/{petId}/needs");
 
         response.ShouldNotBeNull();
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
@@ -171,7 +171,7 @@ public class PetsApiTests
 
         var client = application.CreateClient();
 
-        var response = await client.GetAsync("https://localhost7196:/pets/activities");
+        var response = await client.GetAsync("/pets/activities");
 
         response.ShouldNotBeNull();
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -191,7 +191,7 @@ public class PetsApiTests
         var client = application.CreateClient();
         
         var petId = "notapetid";
-        var response = await client.GetAsync($"https://localhost:7196/pets/{petId}/activities");
+        var response = await client.GetAsync($"/pets/{petId}/activities");
 
         response.ShouldNotBeNull();
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
@@ -208,7 +208,7 @@ public class PetsApiTests
 
         var client = application.CreateClient();
         var petId = "notapetid";
-        var response = await client.PostAsJsonAsync($"https://localhost7196:/pets/{petId}/activities", new { });
+        var response = await client.PostAsJsonAsync($"/pets/{petId}/activities", new { });
 
         response.ShouldNotBeNull();
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
@@ -227,7 +227,7 @@ public class PetsApiTests
         var petId = "abc123";
         var notes = "test";
         var response = await client.PostAsJsonAsync(
-            $"https://localhost7196:/pets/{petId}/activities",
+            $"/pets/{petId}/activities",
             new Activity
             {
                 PetId = petId,

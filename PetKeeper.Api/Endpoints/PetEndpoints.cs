@@ -3,6 +3,8 @@ using PetKeeper.Api.Responses;
 using PetKeeper.Core;
 using PetKeeper.Core.Interfaces;
 
+namespace PetKeeper.Api.Endpoints;
+
 public static class PetEndpoints
 {
     public static IResult AddPet(IPetRepository petRepo, Pet newPet) =>

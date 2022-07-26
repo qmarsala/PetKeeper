@@ -2,8 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using PetKeeper.Core.Interfaces;
 using PetKeeper.Infrastructure;
 using PetKeeper.Core;
-using static PetEndpoints;
-using static ActivityLogEndpoints;
+using static PetKeeper.Api.Endpoints.PetEndpoints;
+using static PetKeeper.Api.Endpoints.ActivityLogEndpoints;
 using PetKeeper.Api.Requests;
 
 var builder = WebApplication.CreateBuilder(args);
