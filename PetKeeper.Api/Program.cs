@@ -11,6 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddScoped<IPetRepository, PetsRepository>();
 builder.Services.AddScoped<IActivityLogRepository, ActivityLogRepository>();
+builder.Services.AddScoped<IPetService, PetService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -37,8 +38,12 @@ app.MapGet("pets/{petId}", ([FromServices] IPetRepository repo, string petId)
 app.MapGet("pets/{petId}/needs", ([FromServices] IPetRepository repo, string petId) 
     => GetPetNeeds(repo, petId));
 
-app.MapPost("pets/{petId}/needs", ([FromServices] IPetRepository repo, string petId, [FromBody] Need newNeed)
-    => AddPetNeed(repo, petId, newNeed));
+app.MapPost("pets/{petId}/needs", (
+    [FromServices] IPetRepository repo, 
+    [FromServices] IPetService petService, 
+    string petId, 
+    [FromBody] Need newNeed)
+    => AddPetNeed(repo, petService, petId, newNeed));
 
 app.MapPost("pets/{petId}/activities", (
     [FromServices] IPetRepository petRepo,
