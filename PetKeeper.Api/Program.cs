@@ -52,7 +52,7 @@ app.MapGet("pets/{petId}/needs", ([FromServices] IPetRepository repo, string pet
 app.MapPost("pets/{petId}/activities", (
     [FromServices] IPetRepository petRepo,
     [FromServices] IActivityLogRepository activityLogRepo,
-    string petId, 
+    string petId,
     [FromBody] LogActivityRequest request) =>
     GetPet(petRepo, petId)
     .Map(p => LogActivity(activityLogRepo, p.Id, request.NeedId, request.Notes))
@@ -91,4 +91,9 @@ public record PetsResponse
 public record ActivitiesResponse
 {
     public List<Activity> Activities { get; init; } = new();
+}
+
+public record PetNeedsResponse
+{
+    public List<Need> PetNeeds { get; init; } = new();
 }

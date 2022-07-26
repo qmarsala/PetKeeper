@@ -57,6 +57,42 @@ public class PetsApiTests
     }
 
     [Fact]
+    public async Task WhenGettingAPetsNeeds()
+    {
+        var application = new WebApplicationFactory<Program>()
+            .WithWebHostBuilder(builder =>
+            {
+
+            });
+
+        var client = application.CreateClient();
+        var petId = "abc123";
+        var response = await client.GetAsync($"https://localhost7196:/pets/{petId}/needs");
+
+        response.ShouldNotBeNull();
+        response.StatusCode.ShouldBe(System.Net.HttpStatusCode.OK);
+        var needs = await response.Content.ReadFromJsonAsync<PetNeedsResponse>();
+        needs.ShouldNotBeNull();
+    }
+
+    [Fact]
+    public async Task WhenGettingAPetsNeedsForUnknownPet()
+    {
+        var application = new WebApplicationFactory<Program>()
+            .WithWebHostBuilder(builder =>
+            {
+
+            });
+
+        var client = application.CreateClient();
+        var petId = "notapetid";
+        var response = await client.GetAsync($"https://localhost7196:/pets/{petId}/needs");
+
+        response.ShouldNotBeNull();
+        response.StatusCode.ShouldBe(System.Net.HttpStatusCode.NotFound);
+    }
+
+    [Fact]
     public async Task WhenGettingAllPets()
     {
         var application = new WebApplicationFactory<Program>()
@@ -96,7 +132,7 @@ public class PetsApiTests
     }
 
     [Fact]
-    public async Task WhenGettingActivitiesForAnUknownPet()
+    public async Task WhenGettingActivitiesForAnUnknownPet()
     {
         var application = new WebApplicationFactory<Program>()
             .WithWebHostBuilder(builder =>
