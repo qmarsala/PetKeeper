@@ -16,6 +16,7 @@ public class PetsApiTests
         var client = application.CreateClient();
 
         var response = await client.GetAsync("https://localhost7196:/pets");
+
         response.ShouldNotBeNull();
         response.StatusCode.ShouldBe(System.Net.HttpStatusCode.OK);
         var pets = await response.Content.ReadFromJsonAsync<PetsResponse>();
@@ -34,7 +35,7 @@ public class PetsApiTests
 
         var client = application.CreateClient();
         var petId = "notapetid";
-        var response = await client.PostAsJsonAsync($"https://localhost7196:/pets/{petId}/activities", new {});
+        var response = await client.PostAsJsonAsync($"https://localhost7196:/pets/{petId}/activities", new { });
 
         response.ShouldNotBeNull();
         response.StatusCode.ShouldBe(System.Net.HttpStatusCode.NotFound);
@@ -51,7 +52,14 @@ public class PetsApiTests
 
         var client = application.CreateClient();
         var petId = "abc123";
-        var response = await client.PostAsJsonAsync($"https://localhost7196:/pets/{petId}/activities", new Activity { PetId = petId, Notes = "test"});
+        var notes = "test";
+        var response = await client.PostAsJsonAsync(
+            $"https://localhost7196:/pets/{petId}/activities",
+            new Activity
+            {
+                PetId = petId,
+                Notes = notes
+            });
 
         response.ShouldNotBeNull();
         response.StatusCode.ShouldBe(System.Net.HttpStatusCode.Created);
@@ -59,7 +67,7 @@ public class PetsApiTests
         activity.ShouldNotBeNull();
         activity.Id.ShouldNotBeNull();
         activity.PetId.ShouldBe(petId);
-        activity.Notes.ShouldBe("test");
+        activity.Notes.ShouldBe(notes);
     }
 }
 
