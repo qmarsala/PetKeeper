@@ -76,7 +76,10 @@ app.MapGet("pets/{petId}/activities", (
     GetPet(petRepo, petId)
     .Map(p => GetActivities(activityLogRepo, p.Id))
     .Match(
-        Some: acs => Results.Ok(new { Activities = acs }),
+        Some: oa =>
+            oa.Match(
+                Some: a => Results.Ok(new ActivitiesResponse { Activities = a }), 
+                None: Results.NotFound()),
         None: Results.NotFound()));
 
 app.Run();
