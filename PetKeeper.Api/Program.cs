@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 
-using static PetsFunctions;
-using static ActivityLogFunctions;
+using static PetEntpoints;
+using static ActivityLogEntpoints;
 
 var builder = WebApplication.CreateBuilder(args);
 

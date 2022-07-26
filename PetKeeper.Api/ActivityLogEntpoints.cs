@@ -1,7 +1,7 @@
 using LanguageExt;
 using LanguageExt.Common;
 
-public static class ActivityLogFunctions
+public static class ActivityLogEntpoints
 {
     //temp db
     public static List<Activity> Activities = new List<Activity>();

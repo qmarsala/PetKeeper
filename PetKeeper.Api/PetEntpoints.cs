@@ -1,11 +1,11 @@
 using LanguageExt;
 using LanguageExt.Common;
 
-public static class PetsFunctions
+public static class PetEntpoints
 {
     //tempDb
     private static readonly List<Pet> Pets = new();
-    static PetsFunctions()
+    static PetEntpoints()
     {
         Pets.Add(Mooky);
     }
