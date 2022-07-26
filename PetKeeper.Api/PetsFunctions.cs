@@ -49,15 +49,10 @@ public static class PetsFunctions
         return pet;
     }
 
-    public static Option<List<Pet>> GetPets() =>
-        new List<Pet>
-        {
-            Mooky
-        };
-
+    public static Option<List<Pet>> GetPets() => Pets;
     public static Option<Pet> GetPet(string petId) =>
-        petId == "abc123"
-            ? Mooky
+        Pets.Any(p => p.Id == petId)
+            ? Pets.First(p => p.Id == petId)
             : Option<Pet>.None;
 
     public static Option<IEnumerable<Need>> GetNeeds(string petId) =>

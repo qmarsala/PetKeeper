@@ -56,6 +56,26 @@ public class PetsApiTests
     }
 
     [Fact]
+    public async Task WhenGetAPet()
+    {
+        var application = new WebApplicationFactory<Program>()
+            .WithWebHostBuilder(builder =>
+            {
+
+            });
+
+        var client = application.CreateClient();
+        var petId = "abc123";
+        var response = await client.GetAsync($"https://localhost7196:/pets/{petId}");
+
+        response.ShouldNotBeNull();
+        response.StatusCode.ShouldBe(System.Net.HttpStatusCode.OK);
+        var pet = await response.Content.ReadFromJsonAsync<Pet>();
+        pet.ShouldNotBeNull();
+        pet.Name.ShouldBe("Mooky");
+    }
+
+    [Fact]
     public async Task WhenAddingActivityForUnknownPet()
     {
         var application = new WebApplicationFactory<Program>()
@@ -100,9 +120,4 @@ public class PetsApiTests
         activity.PetId.ShouldBe(petId);
         activity.Notes.ShouldBe(notes);
     }
-}
-
-public record PetsResponse
-{
-    public List<Pet> Pets { get; init; } = new List<Pet>();
 }

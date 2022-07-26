@@ -23,7 +23,7 @@ app.UseHttpsRedirection();
 app.MapGet("pets", () =>
     GetPets()
     .Match(
-        Some: ps => Results.Ok(new { Pets = ps }),
+        Some: ps => Results.Ok(new PetsResponse { Pets = ps }),
         None: Results.NotFound()));
 
 app.MapPost("pets", ([FromBody] Pet request) =>
@@ -70,3 +70,8 @@ app.MapGet("pets/activities", () =>
 app.Run();
 
 public record LogActivityRequest(string? NeedId, string Notes);
+
+public record PetsResponse
+{
+    public List<Pet> Pets { get; init; } = new List<Pet>();
+}
