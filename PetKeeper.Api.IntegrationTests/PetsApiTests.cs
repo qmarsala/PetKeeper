@@ -1,3 +1,4 @@
+using PetKeeper.Core;
 using System.Net.Http.Json;
 
 namespace PetKeeper.Api.Tests;

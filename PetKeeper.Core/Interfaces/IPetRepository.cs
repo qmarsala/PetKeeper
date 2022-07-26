@@ -7,6 +7,6 @@ public interface IPetRepository
 {
     Option<IEnumerable<Pet>> GetAllPets();
     Option<Pet> GetPet(string petId);
-    Result<Pet> AddPet(Pet pet);
-    Option<IEnumerable<Need>> GetPetNeeds(Pet pet);
+    Result<Pet> AddPet(Pet newPet);
+    Option<IEnumerable<Need>> GetPetNeeds(string petId);
 }

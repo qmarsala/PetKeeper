@@ -15,4 +15,9 @@
   <ItemGroup>
     <InternalsVisibleTo Include="PetKeeper.Api.IntegrationTests" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PetKeeper.Core\PetKeeper.Core.csproj" />
+    <ProjectReference Include="..\PetKeeper.Infrastructure\PetKeeper.Infrastructure.csproj" />
+  </ItemGroup>
 </Project>
