@@ -51,14 +51,26 @@ public class PetsRepository : IPetRepository
         return pet;
     }
 
-    public Option<IEnumerable<Pet>> GetAllPets() => Pets;
+    public Result<Pet> UpdatePet(Pet updatedPet)
+    {
+        var petToUpdate = Pets.FirstOrDefault(p => p.Id == updatedPet.Id);
+        if (petToUpdate is null)
+        {
+            return new Result<Pet>(new Exception("No pet to update."));
+        }
+        Pets.Remove(petToUpdate);
+        Pets.Add(updatedPet);
+        return updatedPet;
+    }
+
+    public Option<List<Pet>> GetAllPets() => Pets;
 
     public Option<Pet> GetPet(string petId) =>
         Pets.Any(p => p.Id == petId)
             ? Pets.First(p => p.Id == petId)
             : Option<Pet>.None;
 
-    public Option<IEnumerable<Need>> GetPetNeeds(string petId) =>
+    public Option<List<Need>> GetPetNeeds(string petId) =>
         GetPet(petId)
         .Map(p => p.Needs);
 }

@@ -33,4 +33,19 @@ public static class PetEndpoints
         .Match(
             Some: ns => Results.Ok(new PetNeedsResponse { PetNeeds = ns.ToList() }),
             None: Results.NotFound("No pet found."));
+
+    public static IResult AddPetNeed(IPetRepository petRepo, string petId, Need newNeed) =>
+        petRepo
+        .GetPet(petId)
+        .Match(
+            Some: p => {
+                var need = newNeed with { Id = Guid.NewGuid().ToString() };
+                p.Needs.Add(need);
+
+                return petRepo.UpdatePet(p)
+                    .Match(
+                        Succ: up => Results.Created($"pets/{petId}/needs", need), 
+                        Fail: e => Results.StatusCode(500));
+            },
+            None: Results.NotFound());
 }

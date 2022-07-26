@@ -5,8 +5,9 @@ namespace PetKeeper.Core.Interfaces;
 
 public interface IPetRepository
 {
-    Option<IEnumerable<Pet>> GetAllPets();
+    Option<List<Pet>> GetAllPets();
     Option<Pet> GetPet(string petId);
     Result<Pet> AddPet(Pet newPet);
-    Option<IEnumerable<Need>> GetPetNeeds(string petId);
+    Option<List<Need>> GetPetNeeds(string petId);
+    Result<Pet> UpdatePet(Pet updatedPet);
 }

@@ -6,5 +6,5 @@ public record Pet
     public string Name { get; init; } = "A pet with no name";
     public DateTime Birthday { get; init; } = DateTime.Now;
     public Breed Breed { get; init; } = new Breed("Unknown");
-    public IEnumerable<Need> Needs { get; init; } = Enumerable.Empty<Need>();
+    public List<Need> Needs { get; init; } = new();
 }

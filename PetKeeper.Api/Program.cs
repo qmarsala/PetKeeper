@@ -37,6 +37,9 @@ app.MapGet("pets/{petId}", ([FromServices] IPetRepository repo, string petId)
 app.MapGet("pets/{petId}/needs", ([FromServices] IPetRepository repo, string petId) 
     => GetPetNeeds(repo, petId));
 
+app.MapPost("pets/{petId}/needs", ([FromServices] IPetRepository repo, string petId, [FromBody] Need newNeed)
+    => AddPetNeed(repo, petId, newNeed));
+
 app.MapPost("pets/{petId}/activities", (
     [FromServices] IPetRepository petRepo,
     [FromServices] IActivityLogRepository activityLogRepo,
