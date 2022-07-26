@@ -1,5 +1,5 @@
 using LanguageExt;
-using LanguageExt.Common;
+using PetKeeper.Api.Responses;
 using PetKeeper.Core;
 using PetKeeper.Core.Interfaces;
 
@@ -29,6 +29,6 @@ public static class PetEndpoints
         petRepo
         .GetPetNeeds(petId)
         .Match(
-            Some: ns => Results.Ok(new { Needs = ns }),
+            Some: ns => Results.Ok(new PetNeedsResponse { PetNeeds = ns.ToList() }),
             None: Results.NotFound());
 }

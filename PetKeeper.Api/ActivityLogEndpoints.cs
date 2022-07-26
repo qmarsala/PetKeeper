@@ -1,5 +1,5 @@
-using LanguageExt;
-using LanguageExt.Common;
+using PetKeeper.Api.Requests;
+using PetKeeper.Api.Responses;
 using PetKeeper.Core;
 using PetKeeper.Core.Interfaces;
 
@@ -9,7 +9,7 @@ public static class ActivityLogEndpoints
         repo
         .GetAllActivities()
         .Match(
-            Some: acs => Results.Ok(new { Activities = acs }),
+            Some: acs => Results.Ok(new ActivitiesResponse { Activities = acs }),
             None: Results.NotFound());
 
     public static IResult GetActivitiesByPetId(IPetRepository petRpeo, IActivityLogRepository activityLogRepo, string petId) =>
@@ -19,12 +19,11 @@ public static class ActivityLogEndpoints
         .Match(
             Some: oa =>
                 oa.Match(
-                    Some: a => Results.Ok(new ActivitiesResponse { Activities = a }),
+                    Some: acs => Results.Ok(new ActivitiesResponse { Activities = acs }),
                     None: Results.NotFound()),
             None: Results.NotFound());
 
-    public static IResult LogActivityForPet(
-        IPetRepository petRepo, IActivityLogRepository activityLogRepo, string petId, LogActivityRequest request) =>
+    public static IResult LogActivityForPet(IPetRepository petRepo, IActivityLogRepository activityLogRepo, string petId, LogActivityRequest request) =>
         petRepo
         .GetPet(petId)
         .Map(p => activityLogRepo.AddActivityLog(new Activity

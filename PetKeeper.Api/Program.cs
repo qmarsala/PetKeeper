@@ -4,6 +4,7 @@ using PetKeeper.Infrastructure;
 using PetKeeper.Core;
 using static PetEndpoints;
 using static ActivityLogEndpoints;
+using PetKeeper.Api.Requests;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,20 +54,3 @@ app.MapGet("pets/{petId}/activities", (
     => GetActivitiesByPetId(petRepo, activityLogRepo, petId));
 
 app.Run();
-
-public record LogActivityRequest(string? NeedId, string Notes);
-
-public record PetsResponse
-{
-    public List<Pet> Pets { get; init; } = new();
-}
-
-public record ActivitiesResponse
-{
-    public List<Activity> Activities { get; init; } = new();
-}
-
-public record PetNeedsResponse
-{
-    public List<Need> PetNeeds { get; init; } = new();
-}
