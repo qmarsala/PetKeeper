@@ -6,7 +6,7 @@ using PetKeeper.Core.Interfaces;
 public static class PetEndpoints
 {
     public static Result<Pet> AddPet(IPetRepository petRepo, Pet newPet) => 
-        petRepo.AddPet(newPet);
+        petRepo.AddPet(newPet); 
 
     public static Option<List<Pet>> GetPets(IPetRepository petRepo) =>
         petRepo.GetAllPets()
@@ -14,7 +14,6 @@ public static class PetEndpoints
 
     public static Option<Pet> GetPet(IPetRepository petRepo, string petId) =>
         petRepo.GetPet(petId);
-
 
     public static Option<IEnumerable<Need>> GetNeeds(IPetRepository petRepo, string petId) =>
         petRepo.GetPetNeeds(petId);
