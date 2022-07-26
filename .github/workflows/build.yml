@@ -3,7 +3,7 @@ on:
     branches:
       - main
     paths-ignore:
-      - '**/README.md'
+      - 'README.md'
 jobs:
   test:
     runs-on: ubuntu-latest
