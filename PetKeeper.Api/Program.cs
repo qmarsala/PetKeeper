@@ -9,7 +9,7 @@ using PetKeeper.Api.Requests;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddScoped<IPetRepository, PetsRepository>();
+builder.Services.AddScoped<IPetRepository, InMemoryPetsRepository>();
 builder.Services.AddScoped<IActivityLogRepository, ActivityLogRepository>();
 builder.Services.AddScoped<IPetService, PetService>();
 builder.Services.AddEndpointsApiExplorer();

@@ -5,7 +5,7 @@ using PetKeeper.Core.Interfaces;
 
 namespace PetKeeper.Infrastructure;
 
-public class PetsRepository : IPetRepository
+public class InMemoryPetsRepository : IPetRepository
 {
     private static Pet Mooky = new()
     {
@@ -39,7 +39,7 @@ public class PetsRepository : IPetRepository
                 }
     };
     private static readonly List<Pet> Pets = new();
-    static PetsRepository()
+    static InMemoryPetsRepository()
     {
         Pets.Add(Mooky);
     }
