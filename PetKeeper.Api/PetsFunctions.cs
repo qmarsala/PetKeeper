@@ -1,7 +1,15 @@
 using LanguageExt;
+using LanguageExt.Common;
 
 public static class PetsFunctions
 {
+    //tempDb
+    private static readonly List<Pet> Pets = new();
+    static PetsFunctions()
+    {
+        Pets.Add(Mooky);
+    }
+
     private static Pet Mooky = new()
     {
         Id = "abc123",
@@ -33,6 +41,13 @@ public static class PetsFunctions
                     }
                 }
     };
+
+    public static Result<Pet> AddPet(Pet newPet)
+    {
+        var pet = newPet with { Id = Guid.NewGuid().ToString() };
+        Pets.Add(pet);
+        return pet;
+    }
 
     public static Option<List<Pet>> GetPets() =>
         new List<Pet>

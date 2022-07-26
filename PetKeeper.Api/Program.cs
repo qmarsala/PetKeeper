@@ -26,6 +26,12 @@ app.MapGet("pets", () =>
         Some: ps => Results.Ok(new { Pets = ps }),
         None: Results.NotFound()));
 
+app.MapPost("pets", ([FromBody] Pet request) =>
+    AddPet(request)
+    .Match(
+        Succ: p => Results.Created("pets", p),
+        Fail: e => Results.StatusCode(500)));
+
 app.MapGet("pets/{petId}", (string petId) =>
     GetPet(petId)
     .Match(

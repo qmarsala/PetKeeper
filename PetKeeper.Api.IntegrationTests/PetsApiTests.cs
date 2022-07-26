@@ -5,6 +5,37 @@ namespace PetKeeper.Api.Tests;
 public class PetsApiTests
 {
     [Fact]
+    public async Task WhenAddingPet()
+    {
+        var application = new WebApplicationFactory<Program>()
+            .WithWebHostBuilder(builder =>
+            {
+
+            });
+
+        var client = application.CreateClient();
+        var newPet = new Pet
+        {
+            Name = "NewPet",
+            Breed = new Breed("German Shepherd"),
+            Birthday = new DateTime(2020,4,1),
+
+        };
+        var response = await client.PostAsJsonAsync(
+            "https://localhost7196:/pets",
+            newPet);
+
+        response.ShouldNotBeNull();
+        response.StatusCode.ShouldBe(System.Net.HttpStatusCode.Created);
+        var createdPet = await response.Content.ReadFromJsonAsync<Pet>();
+        createdPet.ShouldNotBeNull();
+        createdPet.Id.ShouldNotBeNullOrWhiteSpace();
+        createdPet.Name.ShouldBe(newPet.Name);
+        createdPet.Breed.ShouldBe(newPet.Breed);
+        createdPet.Birthday.ShouldBe(newPet.Birthday);
+    }
+
+    [Fact]
     public async Task WhenGettingAllPets()
     {
         var application = new WebApplicationFactory<Program>()
@@ -65,7 +96,7 @@ public class PetsApiTests
         response.StatusCode.ShouldBe(System.Net.HttpStatusCode.Created);
         var activity = await response.Content.ReadFromJsonAsync<Activity>();
         activity.ShouldNotBeNull();
-        activity.Id.ShouldNotBeNull();
+        activity.Id.ShouldNotBeNullOrWhiteSpace();
         activity.PetId.ShouldBe(petId);
         activity.Notes.ShouldBe(notes);
     }
