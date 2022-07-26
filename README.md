@@ -14,5 +14,5 @@ Such as:
 - Share pet profiles with pet sitter to easily share what the pet needs, and see that it is being kept up on.
 
 ### Future
-More inclusive of other pets (mostly will be about dogs at first)
-integrations with vets and pet resorts?
+- More inclusive of other pets (mostly will be about dogs at first)
+- integrations with vets and pet resorts?
