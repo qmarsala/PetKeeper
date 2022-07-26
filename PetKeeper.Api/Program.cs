@@ -52,7 +52,8 @@ app.MapGet("pets/{petId}/needs", ([FromServices] IPetRepository repo, string pet
 app.MapPost("pets/{petId}/activities", (
     [FromServices] IPetRepository petRepo,
     [FromServices] IActivityLogRepository activityLogRepo,
-    string petId, [FromBody] LogActivityRequest request) =>
+    string petId, 
+    [FromBody] LogActivityRequest request) =>
     GetPet(petRepo, petId)
     .Map(p => LogActivity(activityLogRepo, p.Id, request.NeedId, request.Notes))
     .Match(
@@ -73,10 +74,10 @@ app.MapGet("pets/{petId}/activities", (
     [FromServices] IActivityLogRepository activityLogRepo,
     string petId) =>
     GetPet(petRepo, petId)
-    .Map(p => GetActivities(activityLogRepo, p.Id)
+    .Map(p => GetActivities(activityLogRepo, p.Id))
     .Match(
         Some: acs => Results.Ok(new { Activities = acs }),
-        None: Results.NotFound())));
+        None: Results.NotFound()));
 
 app.Run();
 
@@ -84,5 +85,10 @@ public record LogActivityRequest(string? NeedId, string Notes);
 
 public record PetsResponse
 {
-    public List<Pet> Pets { get; init; } = new List<Pet>();
+    public List<Pet> Pets { get; init; } = new();
+}
+
+public record ActivitiesResponse
+{
+    public List<Activity> Activities { get; init; } = new();
 }

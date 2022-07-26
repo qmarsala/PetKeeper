@@ -37,6 +37,26 @@ public class PetsApiTests
     }
 
     [Fact]
+    public async Task WhenGettingAPet()
+    {
+        var application = new WebApplicationFactory<Program>()
+            .WithWebHostBuilder(builder =>
+            {
+
+            });
+
+        var client = application.CreateClient();
+        var petId = "abc123";
+        var response = await client.GetAsync($"https://localhost7196:/pets/{petId}");
+
+        response.ShouldNotBeNull();
+        response.StatusCode.ShouldBe(System.Net.HttpStatusCode.OK);
+        var pet = await response.Content.ReadFromJsonAsync<Pet>();
+        pet.ShouldNotBeNull();
+        pet.Name.ShouldBe("Mooky");
+    }
+
+    [Fact]
     public async Task WhenGettingAllPets()
     {
         var application = new WebApplicationFactory<Program>()
@@ -57,7 +77,7 @@ public class PetsApiTests
     }
 
     [Fact]
-    public async Task WhenGetAPet()
+    public async Task WhenGettingAllActivities()
     {
         var application = new WebApplicationFactory<Program>()
             .WithWebHostBuilder(builder =>
@@ -66,14 +86,31 @@ public class PetsApiTests
             });
 
         var client = application.CreateClient();
-        var petId = "abc123";
-        var response = await client.GetAsync($"https://localhost7196:/pets/{petId}");
+
+        var response = await client.GetAsync("https://localhost7196:/pets/activities");
 
         response.ShouldNotBeNull();
         response.StatusCode.ShouldBe(System.Net.HttpStatusCode.OK);
-        var pet = await response.Content.ReadFromJsonAsync<Pet>();
-        pet.ShouldNotBeNull();
-        pet.Name.ShouldBe("Mooky");
+        var pets = await response.Content.ReadFromJsonAsync<ActivitiesResponse>();
+        pets.ShouldNotBeNull();
+    }
+
+    [Fact]
+    public async Task WhenGettingActivitiesForAnUknownPet()
+    {
+        var application = new WebApplicationFactory<Program>()
+            .WithWebHostBuilder(builder =>
+            {
+
+            });
+
+        var client = application.CreateClient();
+        
+        var petId = "notapetid";
+        var response = await client.GetAsync($"https://localhost:7196/pets/{petId}/activities");
+
+        response.ShouldNotBeNull();
+        response.StatusCode.ShouldBe(System.Net.HttpStatusCode.NotFound);
     }
 
     [Fact]
