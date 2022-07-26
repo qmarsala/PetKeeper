@@ -5,7 +5,7 @@ VisualStudioVersion = 17.2.32630.192
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PetKeeper.Api", "PetKeeper.Api\PetKeeper.Api.csproj", "{189688AC-2FAA-43D1-841E-82EC6F6A29A0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetKeeper.Api.IntegrationTests", "PetKeeper.Api.Tests\PetKeeper.Api.IntegrationTests.csproj", "{01840A43-161C-45B5-A969-439C478B47EF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetKeeper.Api.IntegrationTests", "PetKeeper.Api.IntegrationTests\PetKeeper.Api.IntegrationTests.csproj", "{01840A43-161C-45B5-A969-439C478B47EF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
