@@ -78,6 +78,35 @@ public class PetsApiTests
     }
 
     [Fact]
+    public async Task WhenAddingNeeds()
+    {
+        var application = new WebApplicationFactory<Program>()
+            .WithWebHostBuilder(builder =>
+            {
+
+            });
+
+        var client = application.CreateClient();
+        var petId = "abc123";
+        var newNeed = new Need
+        {
+            Name = "Tests",
+            Days = new List<DayOfWeek>() { { DayOfWeek.Monday } },
+            Times = 3
+        };
+        var response = await client.PostAsJsonAsync($"https://localhost7196:/pets/{petId}/needs", newNeed);
+
+        response.ShouldNotBeNull();
+        response.StatusCode.ShouldBe(HttpStatusCode.Created);
+        var createdNeed = await response.Content.ReadFromJsonAsync<Need>();
+        createdNeed.ShouldNotBeNull();
+        createdNeed.Id.ShouldNotBeNullOrWhiteSpace();
+        createdNeed.Name.ShouldBe(newNeed.Name);
+        createdNeed.Days.ShouldBe(newNeed.Days);
+        createdNeed.Times.ShouldBe(newNeed.Times);
+    }
+
+    [Fact]
     public async Task WhenAddingNeedsForUnknownPet()
     {
         var application = new WebApplicationFactory<Program>()
