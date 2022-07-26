@@ -18,19 +18,19 @@ public static class PetEndpoints
         .GetAllPets()
         .Match(
             Some: ps => Results.Ok(new PetsResponse { Pets = ps.ToList() }),
-            None: Results.NotFound());
+            None: Results.NotFound("No pets found."));
 
     public static IResult GetPetById(IPetRepository petRepo, string petId) =>
         petRepo
         .GetPet(petId)
         .Match(
             Some: p => Results.Ok(p),
-            None: Results.NotFound());
+            None: Results.NotFound("No pet found."));
 
     public static IResult GetPetNeeds(IPetRepository petRepo, string petId) =>
         petRepo
         .GetPetNeeds(petId)
         .Match(
             Some: ns => Results.Ok(new PetNeedsResponse { PetNeeds = ns.ToList() }),
-            None: Results.NotFound());
+            None: Results.NotFound("No pet found."));
 }

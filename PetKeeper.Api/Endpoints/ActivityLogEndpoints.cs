@@ -12,7 +12,7 @@ public static class ActivityLogEndpoints
         .GetAllActivities()
         .Match(
             Some: acs => Results.Ok(new ActivitiesResponse { Activities = acs }),
-            None: Results.NotFound());
+            None: Results.NotFound("No activity log found."));
 
     public static IResult GetActivitiesByPetId(IPetRepository petRpeo, IActivityLogRepository activityLogRepo, string petId) =>
         petRpeo
@@ -22,8 +22,8 @@ public static class ActivityLogEndpoints
             Some: oa =>
                 oa.Match(
                     Some: acs => Results.Ok(new ActivitiesResponse { Activities = acs }),
-                    None: Results.NotFound()),
-            None: Results.NotFound());
+                    None: Results.NotFound("No activity log found.")),
+            None: Results.NotFound("No pet found."));
 
     public static IResult LogActivityForPet(IPetRepository petRepo, IActivityLogRepository activityLogRepo, string petId, LogActivityRequest request) =>
         petRepo
@@ -39,5 +39,5 @@ public static class ActivityLogEndpoints
             Some: ra => ra.Match(
                 Succ: a => Results.Created("activities", a),
                 Fail: e => Results.StatusCode(500)),
-            None: Results.NotFound());
+            None: Results.NotFound("No pet found."));
 }
