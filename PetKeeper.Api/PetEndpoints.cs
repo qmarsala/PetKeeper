@@ -3,7 +3,7 @@ using LanguageExt.Common;
 using PetKeeper.Core;
 using PetKeeper.Core.Interfaces;
 
-public static class PetEntpoints
+public static class PetEndpoints
 {
     public static Result<Pet> AddPet(IPetRepository petRepo, Pet newPet) => 
         petRepo.AddPet(newPet);

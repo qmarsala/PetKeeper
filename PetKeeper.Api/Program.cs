@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 
-using static PetEntpoints;
-using static ActivityLogEntpoints;
+using static PetEndpoints;
+using static ActivityLogEndpoints;
 using PetKeeper.Core.Interfaces;
 using PetKeeper.Infrastructure;
 using PetKeeper.Core;
@@ -10,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddScoped<IPetRepository, PetsRepository>();
+builder.Services.AddScoped<IActivityLogRepository, ActivityLogRepository>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -49,9 +50,12 @@ app.MapGet("pets/{petId}/needs", ([FromServices] IPetRepository repo, string pet
         None: Results.NotFound()));
 
 
-app.MapPost("pets/{petId}/activities", ([FromServices] IPetRepository repo, string petId, [FromBody] LogActivityRequest request) =>
-    GetPet(repo, petId)
-    .Map(_ => LogActivity(petId, request.NeedId, request.Notes))
+app.MapPost("pets/{petId}/activities", (
+    [FromServices] IPetRepository petRepo,
+    [FromServices] IActivityLogRepository activityLogRepo,
+    string petId, [FromBody] LogActivityRequest request) =>
+    GetPet(petRepo, petId)
+    .Map(p => LogActivity(activityLogRepo, p.Id, request.NeedId, request.Notes))
     .Match(
         Some: ra =>
             ra.Match(
@@ -59,17 +63,21 @@ app.MapPost("pets/{petId}/activities", ([FromServices] IPetRepository repo, stri
                 Fail: e => Results.StatusCode(500)),
         None: Results.NotFound()));
 
-app.MapGet("pets/{petId}/activities", (string petId) =>
-    GetActivities(petId)
+app.MapGet("pets/activities", ([FromServices] IActivityLogRepository activityLogRepo) =>
+    GetActivities(activityLogRepo)
     .Match(
         Some: acs => Results.Ok(new { Activities = acs }),
         None: Results.NotFound()));
 
-app.MapGet("pets/activities", () =>
-    GetActivities()
+app.MapGet("pets/{petId}/activities", (
+    [FromServices] IPetRepository petRepo,
+    [FromServices] IActivityLogRepository activityLogRepo,
+    string petId) =>
+    GetPet(petRepo, petId)
+    .Map(p => GetActivities(activityLogRepo, p.Id)
     .Match(
         Some: acs => Results.Ok(new { Activities = acs }),
-        None: Results.NotFound()));
+        None: Results.NotFound())));
 
 app.Run();
 
