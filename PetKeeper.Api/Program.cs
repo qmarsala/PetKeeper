@@ -37,21 +37,21 @@ app.MapGet("pets/{petId}", async ([FromServices] IMediator mediator, string petI
     => await GetPetById(mediator, new GetPet { PetId = petId }));
 
 app.MapGet("pets/{petId}/needs", async ([FromServices] IMediator mediator, string petId)
-    => await GetPetNeeds(mediator, new GetNeedsByPet{ PetId = petId }));
+    => await GetPetNeeds(mediator, new GetNeedsByPet { PetId = petId }));
 
 app.MapPost("pets/{petId}/needs",
     async ([FromServices] IMediator mediator, string petId, [FromBody] CreateNewNeedForPet request)
-            => await CreateNewNeedForPet(mediator, request with { PetId = petId }));
+        => await CreateNewNeedForPet(mediator, request with { PetId = petId }));
 
 app.MapPost("pets/{petId}/activities",
     async ([FromServices] IMediator mediator, string petId, [FromBody] AddActivityLog request)
-    => await LogActivityForPet(mediator, request with { PetId = petId }));
+        => await LogActivityForPet(mediator, request with { PetId = petId }));
 
 app.MapGet("pets/activities", async ([FromServices] IMediator mediator)
     => await GetAllActivities(mediator, new()));
 
-app.MapGet("pets/{petId}/activities", 
-    async (IMediator mediator,string petId)
+app.MapGet("pets/{petId}/activities",
+    async (IMediator mediator, string petId)
         => await GetActivitiesByPetId(mediator, new GetActivitiesByPet { PetId = petId }));
 
 app.Run();
