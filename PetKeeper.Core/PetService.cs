@@ -14,9 +14,8 @@ public class PetService : IPetService
 
     public Result<Need> AddNeedToPet(Pet pet, Need newNeed)
     {
-        var need = newNeed with { Id = Guid.NewGuid().ToString() };
         var updatedPet = pet with { };
-        updatedPet.Needs.Add(need);
+        var need = updatedPet.AddNewNeed(newNeed);
 
         return PetRepository
             .UpdatePet(updatedPet)
@@ -24,4 +23,19 @@ public class PetService : IPetService
                 Succ: _ => need,
                 Fail: e => new Result<Need>(e));
     }
+
+    public Result<Need> AddNeedToPet(string petId, Need newNeed) =>
+        PetRepository
+            .GetPet(petId)
+            .Match(
+                Some: p =>
+                {
+                    var need = p.AddNewNeed(newNeed);
+                    return PetRepository
+                        .UpdatePet(p)
+                        .Match(
+                            Succ: _ => need,
+                            Fail: e => new Result<Need>(e));
+                },
+                None: new Result<Need>(new Exception("No pet found")));
 }

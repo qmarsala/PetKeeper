@@ -7,4 +7,11 @@ public record Pet
     public DateTime Birthday { get; init; } = DateTime.Now;
     public Breed Breed { get; init; } = new Breed("Unknown");
     public List<Need> Needs { get; init; } = new();
+
+    public Need AddNewNeed(Need need)
+    {
+        var newNeed = need with { Id = Guid.NewGuid().ToString() };
+        Needs.Add(newNeed);
+        return newNeed;
+    }
 }

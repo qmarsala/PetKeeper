@@ -4,5 +4,6 @@ namespace PetKeeper.Core.Interfaces;
 
 public interface IPetService
 {
-    Result<Need> AddNeedToPet(Pet p, Need newNeed);
+    Result<Need> AddNeedToPet(Pet pet, Need newNeed);
+    Result<Need> AddNeedToPet(string petId, Need newNeed);
 }
