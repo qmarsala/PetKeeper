@@ -24,18 +24,6 @@ builder.Services.AddSingleton(sp =>
     var producerBuilder = new ProducerBuilder<string, string>(producerConfig);
     return producerBuilder.Build();
 });
-builder.Services.AddSingleton(sp =>
-{
-    var consumerConfig = new ConsumerConfig
-    {
-        BootstrapServers = "localhost",
-        GroupId = "petkeeper",
-        EnableAutoOffsetStore = false,
-        AutoOffsetReset = AutoOffsetReset.Earliest
-    };
-    var consumerBuilder = new ConsumerBuilder<string, string>(consumerConfig);
-    return consumerBuilder.Build();
-});
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 {
     return ConnectionMultiplexer.Connect("localhost");
@@ -47,10 +35,33 @@ builder.Services.AddScoped<IReadActivityLogs, ActivityLogReader>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-//todo: these need to be seperate process or use typed consumers
-// when they use the same consumer they mess each other up (w/ this order, pets become activities)
-builder.Services.AddHostedService<PetCacheWorker>();
-//builder.Services.AddHostedService<ActivityLogCacheWorker>();
+builder.Services.AddHostedService<PetCacheWorker>(sp =>
+{
+    var consumerConfig = new ConsumerConfig
+    {
+        BootstrapServers = "localhost",
+        GroupId = "petkeeper",
+        EnableAutoOffsetStore = false,
+        AutoOffsetReset = AutoOffsetReset.Earliest
+    };
+    var consumerBuilder = new ConsumerBuilder<string, string>(consumerConfig);
+    var consumer = consumerBuilder.Build();
+    return new PetCacheWorker(consumer, sp.GetRequiredService<IConnectionMultiplexer>());
+});
+
+builder.Services.AddHostedService<ActivityLogCacheWorker> (sp =>
+{
+    var consumerConfig = new ConsumerConfig
+    {
+        BootstrapServers = "localhost",
+        GroupId = "petkeeper",
+        EnableAutoOffsetStore = false,
+        AutoOffsetReset = AutoOffsetReset.Earliest
+    };
+    var consumerBuilder = new ConsumerBuilder<string, string>(consumerConfig);
+    var consumer = consumerBuilder.Build();
+    return new ActivityLogCacheWorker(consumer, sp.GetRequiredService<IConnectionMultiplexer>());
+});
 
 var app = builder.Build();
 

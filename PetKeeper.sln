@@ -7,9 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PetKeeper.Api", "PetKeeper.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PetKeeper.Api.IntegrationTests", "PetKeeper.Api.IntegrationTests\PetKeeper.Api.IntegrationTests.csproj", "{01840A43-161C-45B5-A969-439C478B47EF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetKeeper.Infrastructure", "PetKeeper.Infrastructure\PetKeeper.Infrastructure.csproj", "{0321E0DB-2FAE-4C66-9ACF-070AB823C2A8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PetKeeper.Infrastructure", "PetKeeper.Infrastructure\PetKeeper.Infrastructure.csproj", "{0321E0DB-2FAE-4C66-9ACF-070AB823C2A8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetKeeper.Core", "PetKeeper.Core\PetKeeper.Core.csproj", "{D7213DBE-C4A2-4149-B857-FE60340C0F2F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PetKeeper.Core", "PetKeeper.Core\PetKeeper.Core.csproj", "{D7213DBE-C4A2-4149-B857-FE60340C0F2F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
