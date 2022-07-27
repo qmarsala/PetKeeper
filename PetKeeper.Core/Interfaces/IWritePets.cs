@@ -1,4 +1,5 @@
-﻿using LanguageExt.Common;
+﻿using LanguageExt;
+using LanguageExt.Common;
 
 namespace PetKeeper.Core.Interfaces;
 
@@ -8,4 +9,5 @@ namespace PetKeeper.Core.Interfaces;
 public interface IWritePets
 {
     Task<Result<Pet>> WritePet(Pet pet);
+    Task<Result<Unit>> RemovePet(string petId);
 }
