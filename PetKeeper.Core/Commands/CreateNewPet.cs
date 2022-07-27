@@ -29,7 +29,12 @@ public class CreateNewPetHandler : IRequestHandler<CreateNewPet, Result<Pet>>
             Name = request.Name,
             Birthday = request.Birthday,
             Breed = request.Breed,
-            Needs = request.Needs
+            Needs = Enumerable.Concat(
+                request.Needs.Where(n => !string.IsNullOrWhiteSpace(n.Id)),
+                request.Needs
+                    .Where(n => string.IsNullOrWhiteSpace(n.Id))
+                    .Select(n => n with { Id = Guid.NewGuid().ToString() }))
+                .ToList()
         };
         return await PetWriter.WritePet(newPet);
     }

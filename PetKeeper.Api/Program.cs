@@ -30,7 +30,8 @@ builder.Services.AddSingleton(sp =>
     {
         BootstrapServers = "localhost",
         GroupId = "petkeeper",
-        EnableAutoOffsetStore = false
+        EnableAutoOffsetStore = false,
+        AutoOffsetReset = AutoOffsetReset.Earliest
     };
     var consumerBuilder = new ConsumerBuilder<string, string>(consumerConfig);
     return consumerBuilder.Build();
@@ -46,8 +47,10 @@ builder.Services.AddScoped<IReadActivityLogs, ActivityLogReader>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+//todo: these need to be seperate process or use typed consumers
+// when they use the same consumer they mess each other up (w/ this order, pets become activities)
 builder.Services.AddHostedService<PetCacheWorker>();
-builder.Services.AddHostedService<ActivityLogCacheWorker>();
+//builder.Services.AddHostedService<ActivityLogCacheWorker>();
 
 var app = builder.Build();
 

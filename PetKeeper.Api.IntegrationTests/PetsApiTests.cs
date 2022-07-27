@@ -22,11 +22,8 @@ public class PetsApiTests
             Name = "NewPet",
             Breed = new Breed("German Shepherd"),
             Birthday = new DateTime(2020,4,1),
-
         };
-        var response = await client.PostAsJsonAsync(
-            "/pets",
-            newPet);
+        var response = await client.PostAsJsonAsync("/pets", newPet);
 
         response.ShouldNotBeNull();
         response.StatusCode.ShouldBe(HttpStatusCode.Created);
@@ -48,9 +45,9 @@ public class PetsApiTests
             });
 
         var client = application.CreateClient();
-
+        var pet = InsertPet(client, "NewPetForGettingAll");
+        
         var response = await client.GetAsync("/pets");
-
         response.ShouldNotBeNull();
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
         var pets = await response.Content.ReadFromJsonAsync<PetsResponse>();
@@ -68,14 +65,15 @@ public class PetsApiTests
             });
 
         var client = application.CreateClient();
-        var petId = "abc123";
-        var response = await client.GetAsync($"/pets/{petId}");
+
+        var newPet = await InsertPet(client, "NewPetForGettingAPetById");
+        var response = await client.GetAsync($"/pets/{newPet.Id}");
 
         response.ShouldNotBeNull();
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
         var pet = await response.Content.ReadFromJsonAsync<Pet>();
         pet.ShouldNotBeNull();
-        pet.Name.ShouldBe("Mooky");
+        pet.Name.ShouldBe(newPet.Name);
     }
 
     [Fact]
@@ -88,14 +86,14 @@ public class PetsApiTests
             });
 
         var client = application.CreateClient();
-        var petId = "abc123";
+        var pet = await InsertPet(client, "NewPetForAddingNeeds");
         var newNeed = new Need
         {
             Name = "Tests",
             Days = new List<DayOfWeek>() { { DayOfWeek.Monday } },
             Times = 3
         };
-        var response = await client.PostAsJsonAsync($"/pets/{petId}/needs", newNeed);
+        var response = await client.PostAsJsonAsync($"/pets/{pet.Id}/needs", newNeed);
 
         response.ShouldNotBeNull();
         response.StatusCode.ShouldBe(HttpStatusCode.Created);
@@ -134,13 +132,20 @@ public class PetsApiTests
             });
 
         var client = application.CreateClient();
-        var petId = "abc123";
-        var response = await client.GetAsync($"/pets/{petId}/needs");
+        var pet = await InsertPet(client, "NewPetForGettingNeeds", new Need
+        {
+            Name = "Tests",
+            Days = new List<DayOfWeek>() { { DayOfWeek.Monday } },
+            Times = 3
+        });
+
+        var response = await client.GetAsync($"/pets/{pet.Id}/needs");
 
         response.ShouldNotBeNull();
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
         var needs = await response.Content.ReadFromJsonAsync<PetNeedsResponse>();
         needs.ShouldNotBeNull();
+        needs.PetNeeds.Count.ShouldBeGreaterThan(0);
     }
 
     [Fact]
@@ -226,8 +231,7 @@ public class PetsApiTests
         var client = application.CreateClient();
         var petId = "abc123";
         var notes = "test";
-        var response = await client.PostAsJsonAsync(
-            $"/pets/{petId}/activities",
+        var response = await client.PostAsJsonAsync($"/pets/{petId}/activities",
             new Activity
             {
                 PetId = petId,
@@ -241,5 +245,19 @@ public class PetsApiTests
         activity.Id.ShouldNotBeNullOrWhiteSpace();
         activity.PetId.ShouldBe(petId);
         activity.Notes.ShouldBe(notes);
+    }
+
+    private async Task<Pet> InsertPet(HttpClient client, string name, params Need[] needs)
+    {
+        var newPet = new Pet
+        {
+            Name = name,
+            Breed = new Breed("German Shepherd"),
+            Birthday = new DateTime(2020, 4, 1),
+            Needs = needs.ToList()
+        };
+        var createdPet = await client.PostAsJsonAsync("/pets", newPet);
+        await Task.Delay(5000); // bleh, but the create returns the created resource for the caller and we read from a different store
+        return await createdPet.Content.ReadFromJsonAsync<Pet>();
     }
 }

@@ -42,8 +42,8 @@ public class PetCacheWorker : BackgroundService
                     if (petToRemove.HasValue)
                     {
                         await db.ListRemoveAsync("pets", petToRemove);
+                        await db.KeyDeleteAsync(key);
                     }
-                    await db.KeyDeleteAsync(key);
                 }
                 else
                 {
@@ -56,7 +56,7 @@ public class PetCacheWorker : BackgroundService
                     {
                         var pet = JsonSerializer.Deserialize<Pet>(petJson);
                         var json = JsonSerializer.Serialize(new CachedPet { Pet = pet!, Offset = result.Offset });
-                        await db.StringSetAsync(result.Message.Key, json);
+                        await db.StringSetAsync(key, json);
                         if (cachedPetJson.HasValue)
                         {
                             await db.ListRemoveAsync("pets", cachedPetJson);

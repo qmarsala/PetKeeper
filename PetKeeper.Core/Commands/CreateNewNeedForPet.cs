@@ -29,23 +29,25 @@ public class CreateNewNeedForPetHandler : IRequestHandler<CreateNewNeedForPet, R
     {
         var maybePet = await PetReader.GetPet(request.PetId);
         return await maybePet.MatchAsync(
-            Some: async p =>
-            {
-                var need = new Need
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Name = request.Name,
-                    Notes = request.Notes,
-                    Times = request.Times,
-                    Days = request.Days
-                };
-                p.AddNeed(need);
-
-                return (await PetWriter.WritePet(p))
-                            .Match(
-                                Succ: _ => need,
-                                Fail: e => new Result<Need>(e));
-            },
+            Some: async p => await AddNeed(p, request),
             None: () => new Result<Need>(new PetNotFoundException()));
+    }
+
+    private async Task<Result<Need>> AddNeed(Pet p, CreateNewNeedForPet request)
+    {
+        var need = new Need
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = request.Name,
+            Notes = request.Notes,
+            Times = request.Times,
+            Days = request.Days
+        };
+        p.AddNeed(need);
+
+        var result = await PetWriter.WritePet(p);
+        return result.Match(
+                    Succ: _ => need,
+                    Fail: e => new Result<Need>(e));
     }
 }
