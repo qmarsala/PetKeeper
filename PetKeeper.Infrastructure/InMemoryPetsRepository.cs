@@ -46,9 +46,8 @@ public class InMemoryPetsRepository : IPetRepository
 
     public Result<Pet> AddPet(Pet newPet)
     {
-        var pet = newPet with { Id = Guid.NewGuid().ToString() };
-        Pets.Add(pet);
-        return pet;
+        Pets.Add(newPet);
+        return newPet;
     }
 
     public Result<Pet> UpdatePet(Pet updatedPet)

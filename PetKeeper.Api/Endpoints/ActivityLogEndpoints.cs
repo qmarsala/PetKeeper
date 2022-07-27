@@ -1,6 +1,9 @@
+using MediatR;
 using PetKeeper.Api.Requests;
 using PetKeeper.Api.Responses;
 using PetKeeper.Core;
+using PetKeeper.Core.Commands;
+using PetKeeper.Core.Errors;
 using PetKeeper.Core.Interfaces;
 
 namespace PetKeeper.Api.Endpoints;
@@ -25,19 +28,9 @@ public static class ActivityLogEndpoints
                     None: Results.NotFound("No activity log found.")),
             None: Results.NotFound("No pet found."));
 
-    public static IResult LogActivityForPet(IPetRepository petRepo, IActivityLogRepository activityLogRepo, string petId, LogActivityRequest request) =>
-        petRepo
-        .GetPet(petId)
-        .Map(p => activityLogRepo.AddActivityLog(new Activity
-        {
-            PetId = p.Id,
-            NeedId = request.NeedId,
-            When = DateTime.Now,
-            Notes = request.Notes
-        }))
-        .Match(
-            Some: ra => ra.Match(
+    public static async Task<IResult> LogActivityForPet(IMediator mediator, AddActivityLog request) =>
+        (await mediator.Send(request))
+            .Match(
                 Succ: a => Results.Created("activities", a),
-                Fail: e => Results.StatusCode(500)),
-            None: Results.NotFound("No pet found."));
+                Fail: e => e is PetNotFoundException ? Results.NotFound() : Results.StatusCode(500));
 }

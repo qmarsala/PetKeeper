@@ -5,13 +5,15 @@ using PetKeeper.Core;
 using static PetKeeper.Api.Endpoints.PetEndpoints;
 using static PetKeeper.Api.Endpoints.ActivityLogEndpoints;
 using PetKeeper.Api.Requests;
+using MediatR;
+using PetKeeper.Core.Commands;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddMediatR(typeof(CreateNewPetHandler));
 builder.Services.AddScoped<IPetRepository, InMemoryPetsRepository>();
 builder.Services.AddScoped<IActivityLogRepository, ActivityLogRepository>();
-builder.Services.AddScoped<IPetService, PetService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -26,31 +28,25 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGet("pets", ([FromServices] IPetRepository repo) 
+app.MapGet("pets", ([FromServices] IPetRepository repo)
     => GetPets(repo));
 
-app.MapPost("pets", ([FromServices] IPetRepository repo, [FromBody] Pet request) 
-    => AddPet(repo, request));
+app.MapPost("pets", async ([FromServices] IMediator mediator, [FromBody] CreateNewPet request)
+    => await CreateNewPet(mediator, request));
 
-app.MapGet("pets/{petId}", ([FromServices] IPetRepository repo, string petId) 
+app.MapGet("pets/{petId}", ([FromServices] IPetRepository repo, string petId)
     => GetPetById(repo, petId));
 
-app.MapGet("pets/{petId}/needs", ([FromServices] IPetRepository repo, string petId) 
+app.MapGet("pets/{petId}/needs", ([FromServices] IPetRepository repo, string petId)
     => GetPetNeeds(repo, petId));
 
-app.MapPost("pets/{petId}/needs", (
-    [FromServices] IPetRepository repo, 
-    [FromServices] IPetService petService, 
-    string petId, 
-    [FromBody] Need newNeed)
-    => AddPetNeed(repo, petService, petId, newNeed));
+app.MapPost("pets/{petId}/needs",
+    async ([FromServices] IMediator mediator, string petId, [FromBody] CreateNewNeedForPet request)
+            => await CreateNewNeedForPet(mediator, request with { PetId = petId }));
 
-app.MapPost("pets/{petId}/activities", (
-    [FromServices] IPetRepository petRepo,
-    [FromServices] IActivityLogRepository activityLogRepo,
-    string petId,
-    [FromBody] LogActivityRequest request) 
-    => LogActivityForPet(petRepo, activityLogRepo, petId, request));
+app.MapPost("pets/{petId}/activities",
+    async ([FromServices] IMediator mediator, string petId, [FromBody] AddActivityLog request)
+    => await LogActivityForPet(mediator, request with { PetId = petId }));
 
 app.MapGet("pets/activities", ([FromServices] IActivityLogRepository activityLogRepo)
     => GetAllActivities(activityLogRepo));

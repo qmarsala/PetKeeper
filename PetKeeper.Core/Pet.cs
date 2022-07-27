@@ -8,10 +8,9 @@ public record Pet
     public Breed Breed { get; init; } = new Breed("Unknown");
     public List<Need> Needs { get; init; } = new();
 
-    public Need AddNewNeed(Need need)
+    public Need AddNeed(Need need)
     {
-        var newNeed = need with { Id = Guid.NewGuid().ToString() };
-        Needs.Add(newNeed);
-        return newNeed;
+        Needs.Add(need);
+        return need;
     }
 }
