@@ -11,22 +11,19 @@ public record GetActivitiesByPet : IRequest<Option<List<Activity>>>
 
 public class GetActivitiesByPetHandler : IRequestHandler<GetActivitiesByPet, Option<List<Activity>>>
 {
-    public GetActivitiesByPetHandler(IPetRepository petRepository, IActivityLogRepository activityLogRepository)
+    public GetActivitiesByPetHandler(IReadPets petReader, IActivityLogRepository activityLogRepository)
     {
-        PetRepository = petRepository;
+        PetReader = petReader;
         ActivityLogRepository = activityLogRepository;
     }
 
-    public IPetRepository PetRepository { get; }
+    public IReadPets PetReader { get; }
     public IActivityLogRepository ActivityLogRepository { get; }
 
-    public Task<Option<List<Activity>>> Handle(GetActivitiesByPet request, CancellationToken cancellationToken)
-    {
-        return Task.FromResult(
-             PetRepository
-                .GetPet(request.PetId)
-                .Match(
-                    Some: p => ActivityLogRepository.GetAllActivitiesForPet(p.Id), 
-                    None: Option<List<Activity>>.None));
-    }
+    public async Task<Option<List<Activity>>> Handle(GetActivitiesByPet request, CancellationToken cancellationToken) =>
+        (await PetReader
+            .GetPet(request.PetId))
+            .Match(
+                Some: p => ActivityLogRepository.GetAllActivitiesForPet(p.Id),
+                None: Option<List<Activity>>.None);
 }

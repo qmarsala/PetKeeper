@@ -15,20 +15,18 @@ public record AddActivityLog : IRequest<Result<Activity>>
 
 public class AddActivityLogHandler : IRequestHandler<AddActivityLog, Result<Activity>>
 {
-    public AddActivityLogHandler(IPetRepository petRepository, IActivityLogRepository activityLogRepository)
+    public AddActivityLogHandler(IReadPets petReader, IActivityLogRepository activityLogRepository)
     {
-        PetRepository = petRepository;
+        PetReader = petReader;
         ActivityLogRepository = activityLogRepository;
     }
 
-    public IPetRepository PetRepository { get; }
+    public IReadPets PetReader { get; }
     public IActivityLogRepository ActivityLogRepository { get; }
 
-    public Task<Result<Activity>> Handle(AddActivityLog request, CancellationToken cancellationToken)
-    {
-        return Task.FromResult(
-            PetRepository
-            .GetPet(request.PetId)
+    public async Task<Result<Activity>> Handle(AddActivityLog request, CancellationToken cancellationToken) =>
+        (await PetReader
+            .GetPet(request.PetId))
             .Match(
                 Some: _ => ActivityLogRepository.AddActivityLog(new Activity
                 {
@@ -37,6 +35,5 @@ public class AddActivityLogHandler : IRequestHandler<AddActivityLog, Result<Acti
                     When = DateTime.Now,
                     Notes = request.Notes
                 }),
-                None: new Result<Activity>(new PetNotFoundException())));
-    }
+                None: new Result<Activity>(new PetNotFoundException()));
 }

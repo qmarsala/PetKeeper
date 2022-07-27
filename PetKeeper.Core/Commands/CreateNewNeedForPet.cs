@@ -16,37 +16,36 @@ public record CreateNewNeedForPet : IRequest<Result<Need>>
 
 public class CreateNewNeedForPetHandler : IRequestHandler<CreateNewNeedForPet, Result<Need>>
 {
-    public CreateNewNeedForPetHandler(IPetRepository petRepository)
+    public CreateNewNeedForPetHandler(IReadPets petReader, IWritePets petWriter)
     {
-        PetRepository = petRepository;
+        PetReader = petReader;
+        PetWriter = petWriter;
     }
 
-    public IPetRepository PetRepository { get; }
+    public IReadPets PetReader { get; }
+    public IWritePets PetWriter { get; }
 
-    public Task<Result<Need>> Handle(CreateNewNeedForPet request, CancellationToken cancellationToken)
+    public async Task<Result<Need>> Handle(CreateNewNeedForPet request, CancellationToken cancellationToken)
     {
-        return Task.FromResult(
-            PetRepository
-             .GetPet(request.PetId)
-             .Match(
-                 Some: p =>
-                 {
-                     var need = new Need
-                     {
-                         Id = Guid.NewGuid().ToString(),
-                         Name = request.Name,
-                         Notes = request.Notes,
-                         Times = request.Times,
-                         Days = request.Days
-                     };
-                     p.AddNeed(need);
+        var maybePet = await PetReader.GetPet(request.PetId);
+        return await maybePet.MatchAsync(
+            Some: async p =>
+            {
+                var need = new Need
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = request.Name,
+                    Notes = request.Notes,
+                    Times = request.Times,
+                    Days = request.Days
+                };
+                p.AddNeed(need);
 
-                     return PetRepository
-                         .UpdatePet(p)
-                         .Match(
-                             Succ: _ => need,
-                             Fail: e => new Result<Need>(e));
-                 },
-                 None: new Result<Need>(new PetNotFoundException())));
-    }            
+                return (await PetWriter.WritePet(p))
+                            .Match(
+                                Succ: _ => need,
+                                Fail: e => new Result<Need>(e));
+            },
+            None: () => new Result<Need>(new PetNotFoundException()));
+    }
 }

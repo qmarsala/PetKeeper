@@ -41,7 +41,6 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 });
 builder.Services.AddScoped<IWritePets, PetWriter>();
 builder.Services.AddScoped<IReadPets, PetReader>();
-builder.Services.AddScoped<IPetRepository, InMemoryPetsRepository>();
 builder.Services.AddScoped<IActivityLogRepository, ActivityLogRepository>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

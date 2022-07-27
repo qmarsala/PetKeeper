@@ -1,11 +1,10 @@
 ﻿using LanguageExt;
 using LanguageExt.Common;
 using PetKeeper.Core;
-using PetKeeper.Core.Interfaces;
 
 namespace PetKeeper.Infrastructure;
 
-public class InMemoryPetsRepository : IPetRepository
+public class InMemoryPetsRepository
 {
     private static Pet Mooky = new()
     {
