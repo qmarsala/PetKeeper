@@ -5,6 +5,7 @@ using PetKeeper.Api.Responses;
 using PetKeeper.Core.Commands;
 using PetKeeper.Core.Errors;
 using PetKeeper.Core.Interfaces;
+using PetKeeper.Core.Queries;
 
 namespace PetKeeper.Api.Endpoints;
 
@@ -20,28 +21,25 @@ public static class PetEndpoints
         (await mediator.Send(request))
             .Match(
                 Succ: p => Results.Created($"pets/{p.Id}/needs", p),
-                Fail: e => e is PetNotFoundException 
-                    ? Results.NotFound() 
+                Fail: e => e is PetNotFoundException
+                    ? Results.NotFound()
                     : Results.StatusCode(500));
 
-    public static IResult GetPets(IPetRepository petRepo) =>
-        petRepo
-        .GetAllPets()
-        .Match(
-            Some: ps => Results.Ok(new PetsResponse { Pets = ps.ToList() }),
-            None: Results.NotFound("No pets found."));
+    public static async Task<IResult> GetPets(IMediator mediator, GetAllPets query) =>
+        (await mediator.Send(query))
+            .Match(
+                Some: ps => Results.Ok(new PetsResponse { Pets = ps.ToList() }),
+                None: Results.NotFound("No pets found."));
 
-    public static IResult GetPetById(IPetRepository petRepo, string petId) =>
-        petRepo
-        .GetPet(petId)
-        .Match(
-            Some: p => Results.Ok(p),
-            None: Results.NotFound("No pet found."));
+    public static async Task<IResult> GetPetById(IMediator mediator, GetPet query) =>
+        (await mediator.Send(query))
+            .Match(
+                Some: p => Results.Ok(p),
+                None: Results.NotFound("No pet found."));
 
-    public static IResult GetPetNeeds(IPetRepository petRepo, string petId) =>
-        petRepo
-        .GetPetNeeds(petId)
-        .Match(
-            Some: ns => Results.Ok(new PetNeedsResponse { PetNeeds = ns.ToList() }),
-            None: Results.NotFound("No pet found."));
+    public static async Task<IResult> GetPetNeeds(IMediator mediator, GetNeedsByPet query) =>
+        (await mediator.Send(query))
+            .Match(
+                Some: ns => Results.Ok(new PetNeedsResponse { PetNeeds = ns.ToList() }),
+                None: Results.NotFound("No pet found."));
 }

@@ -7,6 +7,7 @@ using static PetKeeper.Api.Endpoints.ActivityLogEndpoints;
 using PetKeeper.Api.Requests;
 using MediatR;
 using PetKeeper.Core.Commands;
+using PetKeeper.Core.Queries;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,17 +29,17 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGet("pets", ([FromServices] IPetRepository repo)
-    => GetPets(repo));
+app.MapGet("pets", async ([FromServices] IMediator mediator)
+    => await GetPets(mediator, new()));
 
 app.MapPost("pets", async ([FromServices] IMediator mediator, [FromBody] CreateNewPet request)
     => await CreateNewPet(mediator, request));
 
-app.MapGet("pets/{petId}", ([FromServices] IPetRepository repo, string petId)
-    => GetPetById(repo, petId));
+app.MapGet("pets/{petId}", async ([FromServices] IMediator mediator, string petId)
+    => await GetPetById(mediator, new GetPet { PetId = petId }));
 
-app.MapGet("pets/{petId}/needs", ([FromServices] IPetRepository repo, string petId)
-    => GetPetNeeds(repo, petId));
+app.MapGet("pets/{petId}/needs", async ([FromServices] IMediator mediator, string petId)
+    => await GetPetNeeds(mediator, new GetNeedsByPet{ PetId = petId }));
 
 app.MapPost("pets/{petId}/needs",
     async ([FromServices] IMediator mediator, string petId, [FromBody] CreateNewNeedForPet request)
@@ -48,13 +49,11 @@ app.MapPost("pets/{petId}/activities",
     async ([FromServices] IMediator mediator, string petId, [FromBody] AddActivityLog request)
     => await LogActivityForPet(mediator, request with { PetId = petId }));
 
-app.MapGet("pets/activities", ([FromServices] IActivityLogRepository activityLogRepo)
-    => GetAllActivities(activityLogRepo));
+app.MapGet("pets/activities", async ([FromServices] IMediator mediator)
+    => await GetAllActivities(mediator, new()));
 
-app.MapGet("pets/{petId}/activities", (
-    [FromServices] IPetRepository petRepo,
-    [FromServices] IActivityLogRepository activityLogRepo,
-    string petId)
-    => GetActivitiesByPetId(petRepo, activityLogRepo, petId));
+app.MapGet("pets/{petId}/activities", 
+    async (IMediator mediator,string petId)
+        => await GetActivitiesByPetId(mediator, new GetActivitiesByPet { PetId = petId }));
 
 app.Run();
