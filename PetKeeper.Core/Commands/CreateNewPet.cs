@@ -14,14 +14,14 @@ public record CreateNewPet : IRequest<Result<Pet>>
 
 public class CreateNewPetHandler : IRequestHandler<CreateNewPet, Result<Pet>>
 {
-    public CreateNewPetHandler(IPetRepository petRepository)
+    public CreateNewPetHandler(IWritePets petWriter)
     {
-        PetRepository = petRepository;
+        PetWriter = petWriter;
     }
 
-    public IPetRepository PetRepository { get; }
+    public IWritePets PetWriter { get; }
 
-    public Task<Result<Pet>> Handle(CreateNewPet request, CancellationToken cancellationToken)
+    public async Task<Result<Pet>> Handle(CreateNewPet request, CancellationToken cancellationToken)
     {
         var newPet = new Pet
         {
@@ -31,6 +31,6 @@ public class CreateNewPetHandler : IRequestHandler<CreateNewPet, Result<Pet>>
             Breed = request.Breed,
             Needs = request.Needs
         };
-        return Task.FromResult(PetRepository.AddPet(newPet));
+        return await PetWriter.WritePet(newPet);
     }
 }

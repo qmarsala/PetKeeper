@@ -6,15 +6,46 @@ using static PetKeeper.Api.Endpoints.ActivityLogEndpoints;
 using MediatR;
 using PetKeeper.Core.Commands;
 using PetKeeper.Core.Queries;
+using Confluent.Kafka;
+using PetKeeper.Api;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddMediatR(typeof(CreateNewPetHandler));
+builder.Services.AddSingleton(sp =>
+{
+    var producerConfig = new ProducerConfig
+    {
+        BootstrapServers = "localhost",
+        Acks = Acks.All
+    };
+    var producerBuilder = new ProducerBuilder<string, string>(producerConfig);
+    return producerBuilder.Build();
+});
+builder.Services.AddSingleton(sp =>
+{
+    var consumerConfig = new ConsumerConfig
+    {
+        BootstrapServers = "localhost",
+        GroupId = "petkeeper",
+        EnableAutoCommit = false
+    };
+    var consumerBuilder = new ConsumerBuilder<string, string>(consumerConfig);
+    return consumerBuilder.Build();
+});
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+{
+    return ConnectionMultiplexer.Connect("localhost");
+});
+builder.Services.AddScoped<IWritePets, PetWriter>();
 builder.Services.AddScoped<IPetRepository, InMemoryPetsRepository>();
 builder.Services.AddScoped<IActivityLogRepository, ActivityLogRepository>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddHostedService<PetCacheWorker>();
 
 var app = builder.Build();
 
