@@ -56,7 +56,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection(); don't need this yet
 
 app.MapGet("pets", async ([FromServices] IMediator mediator)
     => await GetPets(mediator, new()));

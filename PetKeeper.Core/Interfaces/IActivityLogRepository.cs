@@ -8,7 +8,7 @@ namespace PetKeeper.Core.Interfaces;
 // there are io monads and ways of dealing with async
 public interface IWriteActivityLogs
 {
-    Task<Result<Activity>> AddActivityLog(Activity newActivity);
+    Task<Result<Activity>> WriteActivityLog(Activity newActivity);
 }
 
 public interface IReadActivityLogs
