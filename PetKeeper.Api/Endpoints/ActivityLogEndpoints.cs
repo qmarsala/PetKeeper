@@ -18,7 +18,7 @@ public static class ActivityLogEndpoints
         (await mediator.Send(query))
             .Match(
                 Some: al => Results.Ok(new ActivitiesResponse { Activities = al.Activities }),
-                None: Results.NotFound());
+                None: () => Results.NotFound());
 
     public static async Task<IResult> LogActivityForPet(IMediator mediator, AddActivityLog request) =>
         (await mediator.Send(request))

@@ -1,7 +1,11 @@
+using Microsoft.Extensions.DependencyInjection;
 using PetKeeper.Api.Responses;
 using PetKeeper.Core;
+using PetKeeper.Infrastructure;
+using StackExchange.Redis;
 using System.Net;
 using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace PetKeeper.Api.Tests;
 
@@ -21,7 +25,7 @@ public class PetsApiTests
         {
             Name = "NewPet",
             Breed = new Breed("German Shepherd"),
-            Birthday = new DateTime(2020,4,1),
+            Birthday = new DateTime(2020, 4, 1),
         };
         var response = await client.PostAsJsonAsync("/pets", newPet);
 
@@ -44,10 +48,12 @@ public class PetsApiTests
 
             });
 
+        var redis = application.Services.GetRequiredService<IConnectionMultiplexer>();
+        await SeedPet(redis, "getting-all-pets", "Bob");
+
         var client = application.CreateClient();
-        var pet = InsertPet(client, "NewPetForGettingAll");
-        
         var response = await client.GetAsync("/pets");
+
         response.ShouldNotBeNull();
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
         var pets = await response.Content.ReadFromJsonAsync<PetsResponse>();
@@ -64,16 +70,17 @@ public class PetsApiTests
 
             });
 
-        var client = application.CreateClient();
+        var redis = application.Services.GetRequiredService<IConnectionMultiplexer>();
+        await SeedPet(redis, "getting-a-pet", "Joe");
 
-        var newPet = await InsertPet(client, "NewPetForGettingAPetById");
-        var response = await client.GetAsync($"/pets/{newPet.Id}");
+        var client = application.CreateClient();
+        var response = await client.GetAsync($"/pets/getting-a-pet");
 
         response.ShouldNotBeNull();
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
         var pet = await response.Content.ReadFromJsonAsync<Pet>();
         pet.ShouldNotBeNull();
-        pet.Name.ShouldBe(newPet.Name);
+        pet.Name.ShouldBe("Joe");
     }
 
     [Fact]
@@ -86,14 +93,16 @@ public class PetsApiTests
             });
 
         var client = application.CreateClient();
-        var pet = await InsertPet(client, "NewPetForAddingNeeds");
+        var redis = application.Services.GetRequiredService<IConnectionMultiplexer>();
+        await SeedPet(redis, "adding-a-need", "Nelly");
+
         var newNeed = new Need
         {
             Name = "Tests",
             Days = new List<DayOfWeek>() { { DayOfWeek.Monday } },
             Times = 3
         };
-        var response = await client.PostAsJsonAsync($"/pets/{pet.Id}/needs", newNeed);
+        var response = await client.PostAsJsonAsync("/pets/adding-a-need/needs", newNeed);
 
         response.ShouldNotBeNull();
         response.StatusCode.ShouldBe(HttpStatusCode.Created);
@@ -131,15 +140,12 @@ public class PetsApiTests
 
             });
 
-        var client = application.CreateClient();
-        var pet = await InsertPet(client, "NewPetForGettingNeeds", new Need
-        {
-            Name = "Tests",
-            Days = new List<DayOfWeek>() { { DayOfWeek.Monday } },
-            Times = 3
-        });
+        var redis = application.Services.GetRequiredService<IConnectionMultiplexer>();
+        await SeedPet(redis, "getting-pet-needs", "North", new Need { Id = "n1", Name = "testing" });
 
-        var response = await client.GetAsync($"/pets/{pet.Id}/needs");
+        var client = application.CreateClient();
+
+        var response = await client.GetAsync($"/pets/getting-pet-needs/needs");
 
         response.ShouldNotBeNull();
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -194,7 +200,7 @@ public class PetsApiTests
             });
 
         var client = application.CreateClient();
-        
+
         var petId = "notapetid";
         var response = await client.GetAsync($"/pets/{petId}/activities");
 
@@ -247,17 +253,20 @@ public class PetsApiTests
         activity.Notes.ShouldBe(notes);
     }
 
-    private async Task<Pet> InsertPet(HttpClient client, string name, params Need[] needs)
+    private async Task<Pet> SeedPet(IConnectionMultiplexer redis, string id, string name, params Need[] needs)
     {
         var newPet = new Pet
         {
+            Id = id,
             Name = name,
             Breed = new Breed("German Shepherd"),
             Birthday = new DateTime(2020, 4, 1),
             Needs = needs.ToList()
         };
-        var createdPet = await client.PostAsJsonAsync("/pets", newPet);
-        await Task.Delay(5000); // bleh, but the create returns the created resource for the caller and we read from a different store
-        return await createdPet.Content.ReadFromJsonAsync<Pet>();
+        var db = redis.GetDatabase();
+        var cachedPet = new CachedPet { Pet = newPet, Offset = 1 };
+        var json = JsonSerializer.Serialize(cachedPet);
+        await db.StringSetAsync(newPet.Id, json);
+        return newPet;
     }
 }

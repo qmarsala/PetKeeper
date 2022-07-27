@@ -24,6 +24,8 @@ public class GetActivitiesByPetHandler : IRequestHandler<GetActivitiesByPet, Opt
     {
         var maybePet = await PetReader.GetPet(request.PetId);
         return await maybePet
-            .MapAsync(async p => await ActivityLogReader.GetAllActivitiesForPet(p.Id));
+            .MatchAsync(
+                Some: async p => await ActivityLogReader.GetAllActivitiesForPet(p.Id),
+                None: () => Option<ActivityLog>.None);
     }
 }
