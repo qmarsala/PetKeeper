@@ -235,7 +235,10 @@ public class PetsApiTests
             });
 
         var client = application.CreateClient();
-        var petId = "abc123";
+        var redis = application.Services.GetRequiredService<IConnectionMultiplexer>();
+        await SeedPet(redis, "adding-pet-activity", "Aller");
+
+        var petId = "adding-pet-activity";
         var notes = "test";
         var response = await client.PostAsJsonAsync($"/pets/{petId}/activities",
             new Activity
@@ -246,6 +249,7 @@ public class PetsApiTests
 
         response.ShouldNotBeNull();
         response.StatusCode.ShouldBe(HttpStatusCode.Created);
+
         var activity = await response.Content.ReadFromJsonAsync<Activity>();
         activity.ShouldNotBeNull();
         activity.Id.ShouldNotBeNullOrWhiteSpace();
@@ -266,7 +270,13 @@ public class PetsApiTests
         var db = redis.GetDatabase();
         var cachedPet = new CachedPet { Pet = newPet, Offset = 1 };
         var json = JsonSerializer.Serialize(cachedPet);
+        var positions = await db.ListPositionsAsync("pets", json, 1);
+        if (positions.Any())
+        {
+            await db.ListRemoveAsync("pets", json);
+        }
         await db.StringSetAsync(newPet.Id, json);
+        await db.ListLeftPushAsync("pets", json);
         return newPet;
     }
 }

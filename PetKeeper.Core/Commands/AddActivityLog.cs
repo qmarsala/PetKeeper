@@ -32,6 +32,7 @@ public class AddActivityLogHandler : IRequestHandler<AddActivityLog, Result<Acti
             .MatchAsync(
                 Some: async _ => await ActivityLogWriter.WriteActivityLog(new Activity
                 {
+                    Id = Guid.NewGuid().ToString(),
                     PetId = request.PetId,
                     NeedId = request.NeedId,
                     When = DateTime.Now,
