@@ -13,5 +13,5 @@ jobs:
         with:
           dotnet-version: '7.0.x'
           include-prerelease: true
-      - run: docker-compose up -d --wait
+      - run: docker compose up -d --wait
       - run: dotnet test
