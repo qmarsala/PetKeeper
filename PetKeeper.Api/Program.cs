@@ -1,10 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using PetKeeper.Core.Interfaces;
 using PetKeeper.Infrastructure;
-using PetKeeper.Core;
 using static PetKeeper.Api.Endpoints.PetEndpoints;
 using static PetKeeper.Api.Endpoints.ActivityLogEndpoints;
-using PetKeeper.Api.Requests;
 using MediatR;
 using PetKeeper.Core.Commands;
 using PetKeeper.Core.Queries;

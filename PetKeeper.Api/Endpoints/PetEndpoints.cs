@@ -1,10 +1,8 @@
 using LanguageExt;
-using LanguageExt.Common;
 using MediatR;
 using PetKeeper.Api.Responses;
 using PetKeeper.Core.Commands;
 using PetKeeper.Core.Errors;
-using PetKeeper.Core.Interfaces;
 using PetKeeper.Core.Queries;
 
 namespace PetKeeper.Api.Endpoints;

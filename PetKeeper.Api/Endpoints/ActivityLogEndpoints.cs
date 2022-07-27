@@ -1,10 +1,7 @@
 using MediatR;
-using PetKeeper.Api.Requests;
 using PetKeeper.Api.Responses;
-using PetKeeper.Core;
 using PetKeeper.Core.Commands;
 using PetKeeper.Core.Errors;
-using PetKeeper.Core.Interfaces;
 using PetKeeper.Core.Queries;
 
 namespace PetKeeper.Api.Endpoints;
