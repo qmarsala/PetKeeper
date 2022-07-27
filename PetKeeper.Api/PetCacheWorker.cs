@@ -38,32 +38,11 @@ public class PetCacheWorker : BackgroundService
                 var petJson = result.Message.Value;
                 if (petJson is null)
                 {
-                    var petToRemove = await db.StringGetAsync(key);
-                    if (petToRemove.HasValue)
-                    {
-                        await db.ListRemoveAsync("pets", petToRemove);
-                        await db.KeyDeleteAsync(key);
-                    }
+                    await RemovePet(db, key);
                 }
                 else
                 {
-                    var cachedPetJson = await db.StringGetAsync(key);
-                    var cachedPet = cachedPetJson.HasValue
-                        ? JsonSerializer.Deserialize<CachedPet>(cachedPetJson!)
-                        : new CachedPet();
-
-                    if (cachedPet?.Offset < result.Offset)
-                    {
-                        var pet = JsonSerializer.Deserialize<Pet>(petJson);
-                        var json = JsonSerializer.Serialize(new CachedPet { Pet = pet!, Offset = result.Offset });
-                        await db.StringSetAsync(key, json);
-                        if (cachedPetJson.HasValue)
-                        {
-                            await db.ListRemoveAsync("pets", cachedPetJson);
-                        }
-
-                        await db.ListLeftPushAsync("pets", json);
-                    }
+                    await UpdatePet(db, key, petJson, result.Offset);
                 }
 
                 Consumer.StoreOffset(result);
@@ -72,6 +51,37 @@ public class PetCacheWorker : BackgroundService
             {
                 Console.WriteLine(e);
             }
+        }
+    }
+
+    private async Task RemovePet(IDatabase db, string key)
+    {
+        var petToRemove = await db.StringGetAsync(key);
+        if (petToRemove.HasValue)
+        {
+            var positions = await db.ListPositionsAsync("pets", petToRemove, 1);
+            if (positions.Any())
+            {
+                await db.ListRemoveAsync("pets", petToRemove);
+            }
+            await db.KeyDeleteAsync(key);
+        }
+    }
+
+    private async Task UpdatePet(IDatabase db, string key, string petJson, long offset)
+    {
+        var cachedPetJson = await db.StringGetAsync(key);
+        var cachedPet = cachedPetJson.HasValue
+            ? JsonSerializer.Deserialize<CachedPet>(cachedPetJson!)
+            : new CachedPet();
+
+        if (cachedPet?.Offset < offset)
+        {
+            var updatedPet = JsonSerializer.Deserialize<Pet>(petJson);
+            var updatedPetJson = JsonSerializer.Serialize(new CachedPet { Pet = updatedPet!, Offset = offset });
+            await RemovePet(db, key);
+            await db.StringSetAsync(key, updatedPetJson);
+            await db.ListLeftPushAsync("pets", updatedPetJson);
         }
     }
 }
