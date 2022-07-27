@@ -50,19 +50,19 @@ public class PetCacheWorker : BackgroundService
                     var cachedPetJson = await db.StringGetAsync(key);
                     var cachedPet = cachedPetJson.HasValue
                         ? JsonSerializer.Deserialize<CachedPet>(cachedPetJson!)
-                        : new CachedPet(new(), -1);
+                        : new CachedPet();
 
                     if (cachedPet?.Offset < result.Offset)
                     {
                         var pet = JsonSerializer.Deserialize<Pet>(petJson);
-                        var json = JsonSerializer.Serialize(new CachedPet(pet!, result.Offset));
+                        var json = JsonSerializer.Serialize(new CachedPet { Pet = pet!, Offset = result.Offset });
                         await db.StringSetAsync(result.Message.Key, json);
-                        await db.ListLeftPushAsync("pets", json);
-
                         if (cachedPetJson.HasValue)
                         {
                             await db.ListRemoveAsync("pets", cachedPetJson);
                         }
+
+                        await db.ListLeftPushAsync("pets", json);
                     }
                 }
 

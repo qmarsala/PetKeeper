@@ -13,8 +13,8 @@ public interface IWriteActivityLogs
 
 public interface IReadActivityLogs
 {
-    Task<List<Activity>> GetAllActivities();
-    Task<Option<List<Activity>>> GetAllActivitiesForPet(string petId);
+    Task<ActivityLog> GetAllActivities();
+    Task<Option<ActivityLog>> GetAllActivitiesForPet(string petId);
 }
 
 public interface IActivityLogRepository

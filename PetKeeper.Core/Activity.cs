@@ -8,3 +8,8 @@ public record Activity
     public DateTime When { get; init; } = DateTime.Now;
     public string Notes { get; init; } = string.Empty;
 }
+
+public record ActivityLog
+{
+    public List<Activity> Activities { get; init; } = new();
+}

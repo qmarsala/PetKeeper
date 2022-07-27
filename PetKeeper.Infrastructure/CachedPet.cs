@@ -2,4 +2,8 @@
 
 namespace PetKeeper.Infrastructure;
 
-public record CachedPet(Pet Pet, long Offset);
+public record CachedPet
+{
+    public Pet Pet { get; init; } = new();
+    public long Offset { get; init; } = -1;
+};

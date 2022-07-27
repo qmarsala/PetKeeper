@@ -46,6 +46,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddHostedService<PetCacheWorker>();
+builder.Services.AddHostedService<ActivityLogCacheWorker>();
 
 var app = builder.Build();
 
