@@ -11,15 +11,13 @@ public record GetPet : IRequest<Option<Pet>>
 
 public class GetPetHandler : IRequestHandler<GetPet, Option<Pet>>
 {
-    public GetPetHandler(IPetRepository petRepository)
+    public GetPetHandler(IReadPets petReader)
     {
-        PetRepository = petRepository;
+        PetReader = petReader;
     }
 
-    public IPetRepository PetRepository { get; }
+    public IReadPets PetReader { get; }
 
-    public Task<Option<Pet>> Handle(GetPet request, CancellationToken cancellationToken)
-    {
-        return Task.FromResult(PetRepository.GetPet(request.PetId));
-    }
+    public async Task<Option<Pet>> Handle(GetPet request, CancellationToken cancellationToken) 
+        =>  await PetReader.GetPet(request.PetId);
 }

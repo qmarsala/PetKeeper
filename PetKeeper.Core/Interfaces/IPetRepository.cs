@@ -15,7 +15,6 @@ public interface IReadPets
 {
     Task<List<Pet>> GetAllPets();
     Task<Option<Pet>> GetPet(string petId);
-    Task<Option<List<Need>>> GetPetNeeds(string petId);
 }
 
 public interface IPetRepository

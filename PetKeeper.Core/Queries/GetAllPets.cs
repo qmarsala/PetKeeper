@@ -10,15 +10,13 @@ public record GetAllPets : IRequest<Option<List<Pet>>>
 
 public class GetAllPetsHandler : IRequestHandler<GetAllPets, Option<List<Pet>>>
 {
-    public GetAllPetsHandler(IPetRepository petRepository)
+    public GetAllPetsHandler(IReadPets petReader)
     {
-        PetRepository = petRepository;
+        PetReader = petReader;
     }
 
-    public IPetRepository PetRepository { get; }
+    public IReadPets PetReader { get; }
 
-    public Task<Option<List<Pet>>> Handle(GetAllPets request, CancellationToken cancellationToken)
-    {
-        return Task.FromResult(PetRepository.GetAllPets());
-    }
+    public async Task<Option<List<Pet>>> Handle(GetAllPets request, CancellationToken cancellationToken) 
+        => await PetReader.GetAllPets();
 }

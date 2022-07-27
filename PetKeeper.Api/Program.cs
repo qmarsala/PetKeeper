@@ -30,7 +30,7 @@ builder.Services.AddSingleton(sp =>
     {
         BootstrapServers = "localhost",
         GroupId = "petkeeper",
-        EnableAutoCommit = false
+        EnableAutoOffsetStore = false
     };
     var consumerBuilder = new ConsumerBuilder<string, string>(consumerConfig);
     return consumerBuilder.Build();
@@ -40,6 +40,7 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
     return ConnectionMultiplexer.Connect("localhost");
 });
 builder.Services.AddScoped<IWritePets, PetWriter>();
+builder.Services.AddScoped<IReadPets, PetReader>();
 builder.Services.AddScoped<IPetRepository, InMemoryPetsRepository>();
 builder.Services.AddScoped<IActivityLogRepository, ActivityLogRepository>();
 builder.Services.AddEndpointsApiExplorer();
