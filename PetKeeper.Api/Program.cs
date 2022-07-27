@@ -41,7 +41,8 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 });
 builder.Services.AddScoped<IWritePets, PetWriter>();
 builder.Services.AddScoped<IReadPets, PetReader>();
-builder.Services.AddScoped<IActivityLogRepository, ActivityLogRepository>();
+builder.Services.AddScoped<IWriteActivityLogs, ActivityLogWriter>();
+builder.Services.AddScoped<IReadActivityLogs, ActivityLogReader>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

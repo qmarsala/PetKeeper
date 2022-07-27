@@ -11,13 +11,13 @@ public static class ActivityLogEndpoints
     public static async Task<IResult> GetAllActivities(IMediator mediator, GetAllActivities query) =>
         (await mediator.Send(query))
             .Match(
-                Some: acs => Results.Ok(new ActivitiesResponse { Activities = acs }),
+                Some: al => Results.Ok(new ActivitiesResponse { Activities = al.Activities }),
                 None: Results.NotFound("No activity log found."));
 
     public static async Task<IResult> GetActivitiesByPetId(IMediator mediator, GetActivitiesByPet query) =>
         (await mediator.Send(query))
             .Match(
-                Some: acs => Results.Ok(new ActivitiesResponse { Activities = acs }),
+                Some: al => Results.Ok(new ActivitiesResponse { Activities = al.Activities }),
                 None: Results.NotFound());
 
     public static async Task<IResult> LogActivityForPet(IMediator mediator, AddActivityLog request) =>

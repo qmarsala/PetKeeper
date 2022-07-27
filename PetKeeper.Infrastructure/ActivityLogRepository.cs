@@ -1,11 +1,10 @@
 ﻿using LanguageExt;
 using LanguageExt.Common;
 using PetKeeper.Core;
-using PetKeeper.Core.Interfaces;
 
 namespace PetKeeper.Infrastructure;
 
-public class ActivityLogRepository : IActivityLogRepository
+public class ActivityLogRepository
 {
     public static List<Activity> Activities = new();
 

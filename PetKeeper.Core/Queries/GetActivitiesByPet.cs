@@ -4,26 +4,26 @@ using PetKeeper.Core.Interfaces;
 
 namespace PetKeeper.Core.Queries;
 
-public record GetActivitiesByPet : IRequest<Option<List<Activity>>>
+public record GetActivitiesByPet : IRequest<Option<ActivityLog>>
 {
     public string PetId { get; init; }
 }
 
-public class GetActivitiesByPetHandler : IRequestHandler<GetActivitiesByPet, Option<List<Activity>>>
+public class GetActivitiesByPetHandler : IRequestHandler<GetActivitiesByPet, Option<ActivityLog>>
 {
-    public GetActivitiesByPetHandler(IReadPets petReader, IActivityLogRepository activityLogRepository)
+    public GetActivitiesByPetHandler(IReadPets petReader, IReadActivityLogs activityLogReader)
     {
         PetReader = petReader;
-        ActivityLogRepository = activityLogRepository;
+        ActivityLogReader = activityLogReader;
     }
 
     public IReadPets PetReader { get; }
-    public IActivityLogRepository ActivityLogRepository { get; }
+    public IReadActivityLogs ActivityLogReader { get; }
 
-    public async Task<Option<List<Activity>>> Handle(GetActivitiesByPet request, CancellationToken cancellationToken) =>
-        (await PetReader
-            .GetPet(request.PetId))
-            .Match(
-                Some: p => ActivityLogRepository.GetAllActivitiesForPet(p.Id),
-                None: Option<List<Activity>>.None);
+    public async Task<Option<ActivityLog>> Handle(GetActivitiesByPet request, CancellationToken cancellationToken)
+    {
+        var maybePet = await PetReader.GetPet(request.PetId);
+        return await maybePet
+            .MapAsync(async p => await ActivityLogReader.GetAllActivitiesForPet(p.Id));
+    }
 }
