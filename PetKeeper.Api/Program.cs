@@ -40,7 +40,7 @@ builder.Services.AddHostedService<PetCacheWorker>(sp =>
     var consumerConfig = new ConsumerConfig
     {
         BootstrapServers = "localhost",
-        GroupId = "petkeeper",
+        GroupId = "petkeeper-petcache",
         EnableAutoOffsetStore = false,
         AutoOffsetReset = AutoOffsetReset.Earliest
     };
@@ -54,7 +54,7 @@ builder.Services.AddHostedService<ActivityLogCacheWorker> (sp =>
     var consumerConfig = new ConsumerConfig
     {
         BootstrapServers = "localhost",
-        GroupId = "petkeeper",
+        GroupId = "petkeeper-activitycache",
         EnableAutoOffsetStore = false,
         AutoOffsetReset = AutoOffsetReset.Earliest
     };
