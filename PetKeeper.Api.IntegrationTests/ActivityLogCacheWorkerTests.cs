@@ -1,14 +1,14 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using PetKeeper.Core;
 using PetKeeper.Core.Interfaces;
-using PetKeeper.Infrastructure;
 using StackExchange.Redis;
-using System.Text.Json;
 
 namespace PetKeeper.Api.IntegrationTests
 {
     public class ActivityLogCacheWorkerTests
     {
+        private int TestTimeoutSeconds = 45;
+
         [Fact]
         public async Task WhenANewActivityIsInTheLog()
         {
@@ -27,7 +27,7 @@ namespace PetKeeper.Api.IntegrationTests
             var db = redis.GetDatabase();
 
             var cancellationSource = new CancellationTokenSource();
-            cancellationSource.CancelAfter(TimeSpan.FromSeconds(15));
+            cancellationSource.CancelAfter(TimeSpan.FromSeconds(TestTimeoutSeconds));
             var token = cancellationSource.Token;
 
             var sawMessage = false;

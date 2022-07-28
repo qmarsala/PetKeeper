@@ -7,6 +7,8 @@ namespace PetKeeper.Api.IntegrationTests
 {
     public class PetsCacheWorkerTests
     {
+        private int TestTimeoutSeconds = 45;
+
         [Fact]
         public async Task WhenANewPetIsInTheLog()
         {
@@ -25,7 +27,7 @@ namespace PetKeeper.Api.IntegrationTests
             var db = redis.GetDatabase();
 
             var cancellationSource = new CancellationTokenSource();
-            cancellationSource.CancelAfter(TimeSpan.FromSeconds(15));
+            cancellationSource.CancelAfter(TimeSpan.FromSeconds(TestTimeoutSeconds));
             var token = cancellationSource.Token;
 
             while (!token.IsCancellationRequested)
@@ -63,7 +65,7 @@ namespace PetKeeper.Api.IntegrationTests
             var db = redis.GetDatabase();
 
             var cancellationSource = new CancellationTokenSource();
-            cancellationSource.CancelAfter(TimeSpan.FromSeconds(15));
+            cancellationSource.CancelAfter(TimeSpan.FromSeconds(TestTimeoutSeconds));
             var token = cancellationSource.Token;
             while (!token.IsCancellationRequested)
             {
@@ -100,7 +102,7 @@ namespace PetKeeper.Api.IntegrationTests
             await producer.WritePet(newPet);
 
             var seedCancellationSource = new CancellationTokenSource();
-            seedCancellationSource.CancelAfter(TimeSpan.FromSeconds(15));
+            seedCancellationSource.CancelAfter(TimeSpan.FromSeconds(TestTimeoutSeconds));
             var token = seedCancellationSource.Token;
             while (!token.IsCancellationRequested)
             {
@@ -121,7 +123,7 @@ namespace PetKeeper.Api.IntegrationTests
             await producer.WritePet(null);
 
             var tombstoneCancellationSource = new CancellationTokenSource();
-            seedCancellationSource.CancelAfter(TimeSpan.FromSeconds(15));
+            seedCancellationSource.CancelAfter(TimeSpan.FromSeconds(TestTimeoutSeconds));
             var tombstoneToken = seedCancellationSource.Token;
             while (!tombstoneToken.IsCancellationRequested)
             {
