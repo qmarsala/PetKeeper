@@ -50,8 +50,10 @@ public class ActivityLogReader : IReadActivityLogs
     {
         var activities = result
            .Where(x => !string.IsNullOrEmpty(x))
-           .Select(alJson => JsonSerializer.Deserialize<CachedActivity>(alJson!)?.Activity)
+           .Select(alJson => JsonSerializer.Deserialize<CachedActivity>(alJson!))
            .Where(al => al is not null)
+           .Select(al => al!.Activity)
+           .OrderBy(a => a.When)
            .ToList();
         return new ActivityLog { Activities = activities! };
     }
