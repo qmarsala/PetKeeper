@@ -98,7 +98,7 @@ public class ActivityLogCacheWorker : BackgroundService
             await RemoveActivity(db, key);
             var set = db.StringSetAsync(key, updatedActivityJson);
             var add = db.ListLeftPushAsync("activities", updatedActivityJson);
-            var petActivityListKey = $"{cachedActivity.Activity.PetId}.activities";
+            var petActivityListKey = $"{updatedActivity.PetId}.activities";
             var add2 = db.ListLeftPushAsync(petActivityListKey, updatedActivityJson);
             await Task.WhenAll(set, add, add2);
         }
