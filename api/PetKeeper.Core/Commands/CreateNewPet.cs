@@ -34,7 +34,7 @@ public class CreateNewPetHandler : IRequestHandler<CreateNewPet, Result<Pet>>
                 request.Needs
                     .Where(n => string.IsNullOrWhiteSpace(n.Id))
                     .Select(n => n with { Id = Guid.NewGuid().ToString() }))
-                .ToList()
+                    .ToList()
         };
         return await PetWriter.WritePet(newPet);
     }

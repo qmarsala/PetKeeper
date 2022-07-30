@@ -37,14 +37,9 @@ public class ActivityLogCacheWorker : BackgroundService
                 stopWatch.Start();
                 var key = result.Message.Key;
                 var activityJson = result.Message.Value;
-                if (activityJson is null)
-                {
-                    await RemoveActivity(db, key);
-                }
-                else
-                {
-                    await UpdateActivity(db, key, activityJson, result.Offset);
-                }
+                await (activityJson is null
+                    ? RemoveActivity(db, key)
+                    : UpdateActivity(db, key, activityJson, result.Offset));
 
                 Consumer.StoreOffset(result);
                 stopWatch.Stop();

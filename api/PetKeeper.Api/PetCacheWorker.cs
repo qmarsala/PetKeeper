@@ -36,14 +36,9 @@ public class PetCacheWorker : BackgroundService
 
                 var key = result.Message.Key;
                 var petJson = result.Message.Value;
-                if (petJson is null)
-                {
-                    await RemovePet(db, key);
-                }
-                else
-                {
-                    await UpdatePet(db, key, petJson, result.Offset);
-                }
+                await (petJson is null 
+                    ? RemovePet(db, key) 
+                    : UpdatePet(db, key, petJson, result.Offset));
 
                 Consumer.StoreOffset(result);
             }
@@ -75,6 +70,10 @@ public class PetCacheWorker : BackgroundService
             ? JsonSerializer.Deserialize<CachedPet>(cachedPetJson!)
             : new CachedPet();
 
+        // this isn't really good enough, 
+        // the offset could be lesser for a newer event 
+        // if we have increased partitions or versioned our topic
+        // todo: need something better
         if (cachedPet?.Offset < offset)
         {
             var updatedPet = JsonSerializer.Deserialize<Pet>(petJson);

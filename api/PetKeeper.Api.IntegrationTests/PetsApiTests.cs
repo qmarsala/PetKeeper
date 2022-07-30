@@ -1,8 +1,5 @@
-using Microsoft.Extensions.DependencyInjection;
 using PetKeeper.Api.Responses;
-using PetKeeper.Core;
 using PetKeeper.Infrastructure;
-using StackExchange.Redis;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;

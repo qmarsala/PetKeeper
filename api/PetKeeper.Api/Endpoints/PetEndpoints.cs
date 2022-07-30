@@ -1,5 +1,6 @@
 using LanguageExt;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using PetKeeper.Api.Responses;
 using PetKeeper.Core.Commands;
 using PetKeeper.Core.Errors;
@@ -9,6 +10,26 @@ namespace PetKeeper.Api.Endpoints;
 
 public static class PetEndpoints
 {
+    public static IEndpointRouteBuilder RegisterPetEndpoints(this IEndpointRouteBuilder app)
+    {
+        app.MapGet("pets", async ([FromServices] IMediator mediator)
+            => await GetPets(mediator, new()));
+
+        app.MapPost("pets", async ([FromServices] IMediator mediator, [FromBody] CreateNewPet request)
+            => await CreateNewPet(mediator, request));
+
+        app.MapGet("pets/{petId}", async ([FromServices] IMediator mediator, string petId)
+            => await GetPetById(mediator, new GetPet { PetId = petId }));
+
+        app.MapGet("pets/{petId}/needs", async ([FromServices] IMediator mediator, string petId)
+            => await GetPetNeeds(mediator, new GetNeedsByPet { PetId = petId }));
+
+        app.MapPost("pets/{petId}/needs",
+            async ([FromServices] IMediator mediator, string petId, [FromBody] CreateNewNeedForPet request)
+                => await CreateNewNeedForPet(mediator, request with { PetId = petId }));
+        return app;
+    }
+
     public static async Task<IResult> CreateNewPet(IMediator mediator, CreateNewPet request) =>
         (await mediator.Send(request))
             .Match(
