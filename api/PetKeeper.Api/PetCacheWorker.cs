@@ -1,12 +1,12 @@
 ﻿using Confluent.Kafka;
 using static LanguageExt.Prelude;
-using PetKeeper.Core;
 using PetKeeper.Infrastructure;
 using StackExchange.Redis;
-using System.Text.Json;
 using LanguageExt;
 using static PetKeeper.Api.TestGround;
 using Err = LanguageExt.Common.Error;
+using static PetKeeper.Infrastructure.KafkaEff;
+using static PetKeeper.Infrastructure.RedisEff;
 
 namespace PetKeeper.Api;
 
@@ -32,61 +32,6 @@ public static class TestGround
     //    => Eff(() => consumer.Consume(stoppingToken));
     public static Eff<ConsumeResult<string, string>> LogValue(ConsumeResult<string, string> value)
        => Eff(() => { Console.WriteLine($"{value.Message.Key}:{value.Message.Value}"); return value; });
-
-    // how could we improve the redis part of this?
-    // a redis aff? - can we use effs and affs together?
-    public static Eff<ConsumeResult<string, string>> UpdatePet(ConsumeResult<string, string> value, IDatabase db)
-        => Eff(() =>
-        {
-            var key = value.Message.Key;
-            var petJson = value.Message.Value;
-            var offset = value.Offset;
-            var cachedPetJson = db.StringGetAsync(key as string).Result;
-            var cachedPet = cachedPetJson.HasValue
-                ? JsonSerializer.Deserialize<CachedPet>(cachedPetJson!)
-                : new CachedPet();
-
-            // this isn't really good enough, 
-            // the offset could be lesser for a newer event 
-            // if we have increased partitions or versioned our topic
-            // todo: need something better
-            if (cachedPet?.Offset < offset)
-            {
-                var updatedPet = JsonSerializer.Deserialize<Pet>(petJson);
-                var updatedPetJson = JsonSerializer.Serialize(new CachedPet { Pet = updatedPet!, Offset = offset });
-                var petToRemove = db.StringGetAsync(key).Result;
-                // delete dup has made it back
-                if (petToRemove.HasValue)
-                {
-                    var positions = db.ListPositionsAsync("pets", petToRemove, 1).Result;
-                    if (positions.Any())
-                    {
-                        var r = db.ListRemoveAsync("pets", petToRemove).Result;
-                    }
-                    var d = db.KeyDeleteAsync(key).Result;
-                }
-                var s = db.StringSetAsync(key, updatedPetJson).Result;
-                var lp = db.ListLeftPushAsync("pets", updatedPetJson).Result;
-            }
-            return value;
-        });
-
-    public static Eff<ConsumeResult<string, string>> RemovePet(ConsumeResult<string, string> value, IDatabase db)
-        => Eff(() =>
-        {
-            var key = value.Message.Key;
-            var petToRemove = db.StringGetAsync(key).Result;
-            if (petToRemove.HasValue)
-            {
-                var positions = db.ListPositionsAsync("pets", petToRemove, 1).Result;
-                if (positions.Any())
-                {
-                    var r = db.ListRemoveAsync("pets", petToRemove).Result;
-                }
-                var d = db.KeyDeleteAsync(key).Result;
-            }
-            return value;
-        });
 }
 
 public class PetCacheWorker : BackgroundService
@@ -115,29 +60,29 @@ public class PetCacheWorker : BackgroundService
         // implementation
         // also not sure why we need to pass it to run unit - makes me think the closure is bad 
         // and there should be some rt variable for us... ???
-        var liveKafka = new LiveRuntime(Consumer);
+        var liveRT = new LiveRuntime(Consumer, Redis);
         var operation =
             repeat(
-                from value in liveKafka.KafkaEff.Map(c => c.Consume(stoppingToken))
+                from value in liveRT.KafkaEff.Map(c => c.Consume(stoppingToken))
                 from _1 in LogValue(value)
                 from _2 in value.Message.Value is null
-                    ? RemovePet(value, db)
-                    : UpdatePet(value, db)
-                from _3 in liveKafka.KafkaEff.Map(c => c.StoreOffset(value))
+                    ? liveRT.RedisEff.Map(r => r.RemovePet(value))
+                    : liveRT.RedisEff.Map(r => r.UpdatePet(value))
+                from _3 in liveRT.KafkaEff.Map(c => c.StoreOffset(value))
                 select _3);
-        operation.RunUnit(liveKafka);
+        operation.RunUnit(liveRT);
 
         // using the "non environment" eff 
         var useOperation1 = false;
         var operation1 =
             repeat(
                 from _g in guard(useOperation1, Err.New("operation disabled"))
-                from value in KafkaEff.consumeTopic(Consumer)
+                from value in consumeTopic(Consumer)
                 from _1 in LogValue(value)
                 from _2 in value.Message.Value is null
-                    ? RemovePet(value, db)
-                    : UpdatePet(value, db)
-                from _3 in KafkaEff.storeOffset(Consumer, value)
+                    ? removePet(db, value)
+                    : updatePet(db, value)
+                from _3 in storeOffset(Consumer, value)
                 select _3);
         operation1.RunUnit();
     }

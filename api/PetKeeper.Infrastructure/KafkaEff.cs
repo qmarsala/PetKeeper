@@ -18,18 +18,6 @@ public interface HasKafka<RT>
     Eff<RT, KafkaIO> KafkaEff { get; }
 }
 
-public struct LiveRuntime : HasKafka<LiveRuntime>
-{
-    private IConsumer<string, string> Consumer;
-
-    public LiveRuntime(IConsumer<string, string> consumer)
-    {
-        Consumer = consumer;
-    }
-
-    public Eff<LiveRuntime, KafkaIO> KafkaEff => SuccessEff(LiveKafkaIO.Create(Consumer));
-}
-
 //maybe?
 // how are we supposed to capture this IO?
 public struct LiveKafkaIO : KafkaIO
