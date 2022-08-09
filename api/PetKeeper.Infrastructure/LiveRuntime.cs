@@ -16,6 +16,7 @@ public struct LiveRuntime : HasKafka<LiveRuntime>, HasRedis<LiveRuntime>
         ConnectionMultiplexor = connectionMultiplexor;
     }
 
-    public Eff<LiveRuntime, KafkaIO> KafkaEff => SuccessEff(LiveKafkaIO.Create(Consumer));
-    public Eff<LiveRuntime, RedisIO> RedisEff => SuccessEff(LiveRedisIO.Create(ConnectionMultiplexor));
+    // static anon func makes sure we don't accidentally capture "this"
+    public Eff<LiveRuntime, KafkaIO> KafkaEff => Eff<LiveRuntime, KafkaIO>(static rt => LiveKafkaIO.Create(rt.Consumer));
+    public Eff<LiveRuntime, RedisIO> RedisEff => Eff<LiveRuntime, RedisIO>(static rt => LiveRedisIO.Create(rt.ConnectionMultiplexor));
 }

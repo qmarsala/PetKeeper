@@ -34,7 +34,7 @@ public struct LiveKafkaIO : KafkaIO
         return new LiveKafkaIO(consumer);
     }
 
-    public ConsumeResult<string, string> Consume(CancellationToken cancellationToken) => 
+    public ConsumeResult<string, string> Consume(CancellationToken cancellationToken) =>
         Consumer.Consume(cancellationToken);
 
     public Unit StoreOffset(ConsumeResult<string, string> result)
@@ -44,16 +44,12 @@ public struct LiveKafkaIO : KafkaIO
     }
 }
 
-// this seemed simpler - but the runtime is supposed to be cool?
-public static class KafkaEff
+public static class Kafka<RT>
+    where RT : struct, HasKafka<RT>
 {
-    public static Eff<ConsumeResult<string, string>> consumeTopic(IConsumer<string, string> consumer) =>
-        Eff(() => consumer.Consume());
+    public static Eff<RT, ConsumeResult<string, string>> consumeTopic(CancellationToken cancellationToken) 
+        => default(RT).KafkaEff.Map(k => k.Consume(cancellationToken));
 
-    public static Eff<Unit> storeOffset(IConsumer<string, string> consumer, ConsumeResult<string, string> result) =>
-        Eff(() =>
-        {
-            consumer.StoreOffset(result);
-            return unit;
-        });
+    public static Eff<RT, Unit> storeOffset(ConsumeResult<string, string> result)
+        => default(RT).KafkaEff.Map(k => k.StoreOffset(result));
 }

@@ -72,7 +72,7 @@ public struct LiveRedisIO : RedisIO
         {
             var updatedPet = JsonSerializer.Deserialize<Pet>(petJson);
             var updatedPetJson = JsonSerializer.Serialize(new CachedPet { Pet = updatedPet!, Offset = offset });
-            var petToRemove = Db.StringGetAsync(key).Result;
+            _ = Db.StringGetAsync(key).Result;
             RemovePet(value);
             _ = Db.StringSetAsync(key, updatedPetJson).Result;
             _ = Db.ListLeftPushAsync("pets", updatedPetJson).Result;
@@ -81,12 +81,13 @@ public struct LiveRedisIO : RedisIO
     }
 }
 
-// this seemed simpler - but the runtime is supposed to be cool?
-public static class RedisEff
-{
-    public static Eff<Unit> removePet(IDatabase db, ConsumeResult<string, string> value) =>
-        Eff(() => LiveRedisIO.Create(db).RemovePet(value));
 
-    public static Eff<Unit> updatePet(IDatabase db, ConsumeResult<string, string> value) =>
-        Eff(() => LiveRedisIO.Create(db).UpdatePet(value));
+public static class Redis<RT>
+    where RT : struct, HasRedis<RT>
+{
+    public static Eff<RT, Unit> removePet(ConsumeResult<string, string> value)
+        => default(RT).RedisEff.Map(r => r.RemovePet(value));
+
+    public static Eff<RT, Unit> updatePet(ConsumeResult<string, string> value)
+        => default(RT).RedisEff.Map(r => r.UpdatePet(value));
 }
