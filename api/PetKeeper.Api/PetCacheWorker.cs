@@ -30,6 +30,9 @@ public class PetCacheWorker : BackgroundService
         // I think we are missing something here...
         // not sure how the runtime is really supposed to work and I think we are missing the value with this
         // implementation
+        // perhaps we want to pull out our "operation" and then we could run it 
+        // against a "testruntime" in our unit tests?
+        // and then the worker provides the "liveruntime"?
         Consumer.Subscribe(KafkaTopics.Pets);
         var runtime = new LiveRuntime(Consumer, Redis);
         var operation =
