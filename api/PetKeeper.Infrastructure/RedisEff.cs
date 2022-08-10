@@ -7,6 +7,9 @@ using PetKeeper.Core;
 
 namespace PetKeeper.Infrastructure;
 
+// maybe we want to be capturing the actual redis ops here
+// like stringgetasync rather than updatepet
+// we will want redis for other things too
 public interface RedisIO
 {
     Unit RemovePet(ConsumeResult<string, string> value);
@@ -82,6 +85,8 @@ public struct LiveRedisIO : RedisIO
 }
 
 
+// would we then define "remove pet" here?
+// and create petRedis and otherThingRedis?
 public static class Redis<RT>
     where RT : struct, HasRedis<RT>
 {

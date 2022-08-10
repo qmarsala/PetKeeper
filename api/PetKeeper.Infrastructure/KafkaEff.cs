@@ -39,6 +39,7 @@ public struct LiveKafkaIO : KafkaIO
 
     public Unit StoreOffset(ConsumeResult<string, string> result)
     {
+
         Consumer.StoreOffset(result);
         return unit;
     }
